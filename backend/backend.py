@@ -12,8 +12,11 @@ def figalize (word,substitutions_list):
     # Проверяем, сколько слогов по ключевым гласным у нас в слове
     for sub in substitutions_list:
         all_keys += sub['keys']
+    # Для слов, оканчивающихся на 'ая', всегда меняем только первый слог - эмпирически, так прикольнее
+    if word[-2:] == 'ая' or word[-2:] == 'я,' or word[-2:] == 'я.':
+        replacement_step = 1
     # Если слогов меньше 3, то будем заменять первый слог, иначе некрасиво
-    if len([i for i in list(word) if i in set(all_keys)]) <= 2:
+    elif len([i for i in list(word) if i in set(all_keys)]) <= 2:
         replacement_step = 1
     # Для длинных слов с количеством слогов от 3 - меняем первые два слога
     else:
@@ -38,10 +41,13 @@ def load_schemas (filepath):
 schemas = load_schemas('example.json')
 
 while True:
-    inp = str(input('Слово: '))
-    pattern = re.compile("[а-яА-Яеё]+")
-    match = pattern.fullmatch(inp)
+    figalized_result = ''
+    phrase = str(input('Слово или фраза: '))
+    pattern = re.compile("[а-яА-Яеё,. ]+")
+    match = pattern.fullmatch(phrase)
     if match:
-        print(figalize (inp,schemas[current_schema]['substitutions']))
+        for phrase_word in phrase.split(' '):
+            figalized_result += (figalize (phrase_word,schemas[current_schema]['substitutions']) + ' ')
+        print (figalized_result)
     else:
         print ('По-русски, пожалуйста, у нас тут культурное заведение')
