@@ -1,0 +1,56 @@
+<script type="text/javascript" language="javascript">
+
+    function send()
+    {
+        var request = {};
+        var input_phrase = document.getElementById("input_phrase").value;
+        var URL = "http://figachechnaya.ru:8000/api/figalize/";
+
+        request = {
+            schema_id: 0,
+            phrase: input_phrase
+        }
+        request_json = JSON.stringify(request)
+
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = callbackFunction(xmlhttp);
+        xmlhttp.open("POST", URL, false);
+        xmlhttp.setRequestHeader("Content-Type", "application/json");
+        xmlhttp.onreadystatechange = callbackFunction(xmlhttp);
+        xmlhttp.send(request_json);
+        result = JSON.parse(xmlhttp.response)
+        // alert(xmlhttp.response);
+        // document.getElementById("div").innerHTML = xmlhttp.statusText + ":" + xmlhttp.status + "<BR><textarea rows='100' cols='100'>" + xmlhttp.response + "</textarea>";
+        document.getElementById("result").textContent = result.data
+    }
+    
+    function callbackFunction(xmlhttp) 
+    {
+        //alert(xmlhttp.responseXML);
+    }
+</script>
+
+<html>
+    <meta charset="UTF-8">
+    <head>
+        <!-- <meta name="viewport" content="width=device-width"> -->
+        <title>Фигачечная</title>
+        <link href='https://fonts.googleapis.com/css?family=Lobster|Raleway' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Old%20Standard%20TT' rel='stylesheet' type='text/css'>
+        <link href="fonts.css" rel="stylesheet" type="text/css">
+    </head>
+    
+    <body id='bod'>
+        <div class="allButFooter">
+        <h1>Фигачечная</h1>
+        <h2>Бесплатный сервис по офигачиванию слов</h2><br><br><br><br><br><br>
+        <input type="text" id="input_phrase" maxlength="256" name="input_phrase"> <button style="font-family: 'Old Standard TT', sans-serif; font-size: 14px" type="submit" onclick="javascript:send()">Офигачить!</button><br>
+        <p style="color: white; font-family: 'Old Standard TT', sans-serif; font-size: 16px; margin: -10; text-shadow: 3px 3px 5px black;">Cлово/фраза на русском</p><br><br>
+        <p style="color: white; font-family: 'Old Standard TT', sans-serif; font-size: 60px; margin: -10; text-shadow: 3px 3px 5px black;" id="result"></p>
+        </div>
+        <footer>
+            <a style="color: white; font-family: 'Old Standard TT', sans-serif; font-size: 20px; text-shadow: 3px 3px 5px black;" href="https://github.com/realscorp/figachechnaya">github.com/realscorp</a>
+        </footer>
+    </body>
+
+</html>
