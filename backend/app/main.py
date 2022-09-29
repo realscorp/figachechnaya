@@ -1,6 +1,7 @@
 import re
 import json
 from fastapi import FastAPI, Response, status
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 regexp_pattern = "[а-яА-Яеё,. ]+"
@@ -53,6 +54,21 @@ def load_schemas (filepath):
 
 # Создаём API-интерфейс
 app = FastAPI()
+# Разрешаем обращение к API с любых доменов, так как внутри Kubernetes API будет недоступен снаружи
+origins = [
+    "http://figachechnaya.ru",
+    "https://figachechnaya.ru",
+    "http://figachechnaya.ru:8080",
+    "http://localhost",
+    "http://localhost:8080"
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # Описываем обработку запроса к API фигализации
 @app.post("/api/figalize/", status_code=200)
 async def api_figalize_phrase(request: Request, response: Response):
