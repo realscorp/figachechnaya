@@ -4,7 +4,7 @@ from fastapi import FastAPI, Response, status
 from pydantic import BaseModel
 
 regexp_pattern = "[а-яА-Яеё,. ]+"
-json_path = '../data/example.json'
+json_path = '/var/config/example.json'
 
 # Создаём свой тип данных, чтобы загружать в него данные из запроса
 class Request(BaseModel):
