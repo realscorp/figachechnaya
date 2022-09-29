@@ -5,21 +5,21 @@
 Игрушка -> *Фигрушка*  
 Прачечная -> *Фигачечная*  
 ## Архитектура
-               https://figachechnaya.ru
-                         │
-                         │SSL
-                         │
-                 ┌───────▼───────┐
-                 │ INGRESS NGINX │
-                 └───────┬───────┘
-                         │
-                         │HTTP
-                         │
-      get history ┌──────▼─────┐ figalize request
-        ┌─────────┤  FRONTEND  ├───────────┐
-        │         └────────────┘ get schema│
-        │                                  │
-        │                                  │
+                 https://figachechnaya.ru
+                            │
+                            │SSL
+                            │
+                    ┌───────▼───────┐
+                    │ INGRESS NGINX │
+                    └───────┬───────┘
+                            │
+                            │HTTP
+                            │
+         get history ┌──────▼─────┐ figalize request
+           ┌─────────┤  FRONTEND  ├───────────┐
+           │         └────────────┘ get schema│
+           │                                  │
+           │                                  │
     ┌──────▼────────┐                ┌────────▼─────┐
     │    HISTORY    │   add history  │   FIGALIZE   │
     │  microservice │◄───────────────┤ microservice │
