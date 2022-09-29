@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import psycopg
 
-history_count = 10
+history_count = 1
 db_host = 'localhost'
 db_port = '5432'
 db_name = 'history'
@@ -49,6 +49,7 @@ app.add_middleware(
 # Описываем обработку запроса к API добавления записи в историю
 @app.post("/api/append/", status_code=200)
 async def append_history(appendrequest: AppendRequest):
+    print ('Incoming append request, original ' + appendrequest.original + ', figalized: ' + appendrequest.figalized)
     with psycopg.connect(db_connection_string) as conn:
         with conn.cursor() as cur:
             cur.execute(
