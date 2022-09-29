@@ -3,6 +3,7 @@ import json
 from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import sys
 
 regexp_pattern = "[а-яА-Яеё,. ]+"
 json_path = '/var/config/example.json'
@@ -29,7 +30,6 @@ def figalize (word,substitutions_list):
     # Для длинных слов с количеством слогов от 3 - меняем первые два слога
     else:
         replacement_step = 2
-    print (replacement_step)
     for letter in word:
         current_position += 1
         for substitution in substitutions_list:
@@ -69,11 +69,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 # Описываем обработку запроса к API фигализации
 @app.post("/api/figalize/", status_code=200)
 async def api_figalize_phrase(request: Request, response: Response):
     figalized_result = ''
-    # Если фраза не содержит неверных символов, то разбиваем её по словам и процессим их по очереди
+    print('Incoming request:', request)
     if verify_phrase(request.phrase):
         for phrase_word in request.phrase.split(' '):
             figalized_result += (figalize (phrase_word,schemas[request.schema_id]['substitutions']) + ' ')
