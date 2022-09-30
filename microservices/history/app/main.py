@@ -122,6 +122,5 @@ def get_history(response: Response):
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return
 
-
-# while not init_table():
-#     time.sleep(1)
+while not init_table():
+    time.sleep(1)
