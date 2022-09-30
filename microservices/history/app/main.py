@@ -25,11 +25,9 @@ db_connection_string = ('host=' + db_host +
 
 # Инициализируем каунтеры для экспорта метрик
 history_appends_latency_seconds = Histogram('history_appends_latency_seconds', 'Latency histogram for History append request processing')
-history_appends_success_count = Counter('history_appends_success_count', 'Number of times History was succesfully appended')
-history_appends_failed_count = Counter('history_appends_failed_count', 'Number of times History append was failed')
+history_appends_count = Counter('history_appends_count', 'Number of times History append requests was processed',['result'])
 history_get_latency_seconds = Histogram('history_get_latency_seconds', 'Latency histogram for get History request processing')
-history_get_success_count = Counter('history_get_success_count', 'Number of times get History request appended')
-history_get_failed_count = Counter('history_get_failed_count', 'Number of times get History request was failed')
+history_get_count = Counter('history_get_success_count', 'Number of times get History requests was processed',['result'])
 
 # Создаём свой тип данных, чтобы загружать в него данные из запроса
 class AppendRequest(BaseModel):
@@ -88,7 +86,7 @@ async def append_history(appendrequest: AppendRequest, response: Response):
         # Так как API будет доступно снаружи, делаем проверку на лишние символы для безопасности
         if not (verify_phrase(appendrequest.original) and verify_phrase(appendrequest.figalized)):
             print('Недопустимые символы')
-            history_appends_failed_count.inc()
+            history_appends_count.labels('fail').inc()
             response.status_code = status.HTTP_400_BAD_REQUEST
             return
         # Делаем вставку в таблицу переданных значений
@@ -102,11 +100,11 @@ async def append_history(appendrequest: AppendRequest, response: Response):
         except:
             print ('Cannot append to history')
             system_is_ready = False
-            history_appends_failed_count.inc()
+            history_appends_count.labels('fail').inc()
             response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return
         else:
-            history_appends_success_count.inc()
+            history_appends_count.labels('success').inc()
             system_is_ready = True
             return
 
@@ -127,11 +125,11 @@ def get_history(response: Response):
         except:
             print ('Cannot get history')
             system_is_ready = False
-            history_get_failed_count.inc()
+            history_get_count.labels('fail').inc()
             response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return
         else:
-            history_get_success_count.inc()
+            history_get_count.labels('success').inc()
             system_is_ready = True
             return result_list
 
