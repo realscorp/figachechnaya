@@ -5,11 +5,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import requests
 from prometheus_client import start_http_server, Summary, Counter, Gauge, Histogram
+import os
 
 system_is_ready = False
 regexp_pattern = "[а-яА-Яеё,. ]+"
 json_path = '/var/config/example.json'
-append_history_url = 'http://localhost:9000/api/append/'
+
+# Забираем настройки из переменных окружения, всё по best practices
+append_history_url = os.environ['HISTORY_APPEND_URL']
+metrics_port = os.environ['METRICS_PORT_FIGALIZE']
 
 # Инициализируем каунтеры для экспорта метрик
 figalize_latency_seconds = Histogram('figalize_latency_seconds', 'Latency histogram for Figalize request processing')
@@ -128,4 +132,4 @@ def get_history(response: Response):
 
 # Подгружаем схемы фигализации из файла
 schemas = load_schemas(json_path)
-start_http_server(9091)
+start_http_server(int(metrics_port))

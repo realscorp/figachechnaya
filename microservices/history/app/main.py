@@ -8,14 +8,17 @@ import time
 from prometheus_client import start_http_server, Summary, Counter, Gauge, Histogram
 
 regexp_pattern = "[а-яА-Яеё,. ]+"
+# Глубина запроса к истории
 history_count = 1
 system_is_ready = False
-db_host = 'localhost'
-db_port = '5432'
-db_name = 'history'
-db_login = 'history'
-# Секрет получаем из переменных окружения контейнера
+# Забираем настройки из переменных окружения, всё по best practices
+db_host = os.environ['DB_HOST']
+db_port = os.environ['DB_PORT']
+db_name = os.environ['DB_NAME']
+db_login = os.environ['DB_LOGIN']
 db_pass = os.environ['DB_PASS']
+metrics_port = os.environ['METRICS_PORT_HISTORY']
+# Собираем строку подключения для удобства
 db_connection_string = ('host=' + db_host + 
                         ' port=' + db_port +
                         ' dbname=' + db_name +
@@ -148,4 +151,4 @@ def get_history(response: Response):
 # Пока не получится, флаг готовности системы будет false
 while not init_table():
     time.sleep(1)
-start_http_server(9090)
+start_http_server(int(metrics_port))
