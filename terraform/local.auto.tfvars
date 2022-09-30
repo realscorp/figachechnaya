@@ -1,0 +1,15 @@
+subnet_cidr = "10.0.1.0/24"
+postgresql_flavor = "Standard-2-8-50"
+postgresql_disk_size = 10
+postgresql_disk_type = "ceph-ssd"
+cluster_name        = "cluster"
+cluster_version     = "1.21.4"
+master_flavor       = "Standard-2-4-40"
+master_count        = 1
+nodegroup_name      = "default-group"
+node_flavor         = "Standard-2-4-40"
+node_count          = 2
+node_volume_size    = 20
+node_volume_type    = "ceph-ssd"
+az                  = "MS1"
+floating_ip_enabled = true

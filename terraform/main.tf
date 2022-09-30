@@ -1,10 +1,4 @@
-# Настройки для доступа к API Openstack в облаке провайдера VK задаются через переменные окружения, напр.
-# export OS_AUTH_URL="https://infra.mail.ru:35357/v3/"
-# export OS_PROJECT_ID="*****************"
-# export OS_REGION_NAME="RegionOne"
-# export OS_USER_DOMAIN_NAME="users"
-# export OS_USERNAME=**************
-# export OS_PASSWORD=**************
+# Настройки для доступа к API Openstack в облаке провайдера VK задаются через переменные окружения, см. env-setup-example.sh
 
 terraform {
     required_providers {
@@ -15,6 +9,10 @@ terraform {
         mcs = {
             source = "MailRuCloudSolutions/mcs"
             version = "0.6.14"
+        }
+        vkcs = {
+            source = "vk-cs/vkcs"
+            version = "~> 0.1.0"
         }
     }
 }
