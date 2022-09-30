@@ -1,0 +1,107 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: history-env
+  namespace: default
+data:
+  DB_HOST: '10.0.1.17'
+  DB_PORT: '5432'
+  DB_NAME: history
+  METRICS_PORT_HISTORY: '9000'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  history
+  namespace: default
+  labels:
+    app:  history
+spec:
+  selector:
+    matchLabels:
+      app: history
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: history
+    spec:
+      containers:
+      - name: history
+        image: realscorp/history:0.3
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200Mi
+          limits:
+            cpu: 500m
+            memory: 400Mi
+        readinessProbe:
+          httpGet:
+            path: /api/healthz/
+            port: 8000
+          initialDelaySeconds: 5
+          timeoutSeconds: 2
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        env:
+        - name: METRICS_PORT_HISTORY
+          valueFrom:
+            configMapKeyRef:
+              name: history-env
+              key: METRICS_PORT_HISTORY
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: history-env
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: history-env
+              key: DB_PORT
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: history-env
+              key: DB_NAME
+        - name: DB_LOGIN
+          valueFrom:
+            secretKeyRef:
+              name: history
+              key: db_login
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: history
+              key: db_password
+        ports:
+        - containerPort: 8000
+          name:  api
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: history
+  namespace: default
+spec:
+  selector:
+    app: history
+  type: ClusterIP
+  sessionAffinity: None
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  ports:
+  - name: http
+    protocol: TCP
+    port: 8000
+    targetPort: 8000

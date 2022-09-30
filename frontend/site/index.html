@@ -2,7 +2,7 @@
     
     document.addEventListener('DOMContentLoaded', function() {
         console.log ('Запрос к API getschemas')
-        var URL = "http://figachechnaya.ru:8000/api/getschemas/";
+        var URL = "https://figachechnaya.ru/api/getschemas/";
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = callbackFunction(xmlhttp);
         xmlhttp.open("GET", URL, false);
@@ -29,7 +29,7 @@
         var request = {};
         var input_phrase = document.getElementById("input_phrase").value;
         var id = document.getElementById("schema_selection").value;
-        var URL = "http://figachechnaya.ru:8000/api/figalize/";
+        var URL = "https://figachechnaya.ru/api/figalize/";
 
         request = {
             schema_id: id,
@@ -49,7 +49,7 @@
  
     function history()
     {
-        var URL = "http://figachechnaya.ru:9000/api/gethistory/";
+        var URL = "https://figachechnaya.ru/api/gethistory/";
 
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = callbackFunction(xmlhttp);

@@ -1,0 +1,70 @@
+---
+# https://kubernetes.io/docs/concepts/services-networking/ingress/#the-ingress-resource
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: front
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/issuer: "letsencrypt"
+spec:
+  tls:
+  - hosts:
+    - figachechnaya.ru
+    secretName: figachechnaya-tls
+  rules:
+  - host: figachechnaya.ru
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: front
+            port:
+              number: 80
+      - path: /api/figalize
+        pathType: Prefix
+        backend:
+          service:
+            name: figalize
+            port:
+              number: 8000
+      - path: /api/getschemas
+        pathType: Prefix
+        backend:
+          service:
+            name: figalize
+            port:
+              number: 8000
+      - path: /api/gethistory
+        pathType: Prefix
+        backend:
+          service:
+            name: history
+            port:
+              number: 8000
+      - path: /api/append
+        pathType: Prefix
+        backend:
+          service:
+            name: history
+            port:
+              number: 8000
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt
+spec:
+  acme:
+    email: realscorp@outlook.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
