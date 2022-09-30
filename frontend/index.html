@@ -84,16 +84,24 @@
     
     <body id='bod'>
         <div class="allButFooter">
-            <h1>Фигачечная</h1>
-            <h2>Бесплатный сервис по офигачиванию слов</h2>
-            <!-- <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br> -->
+            <div class="header-vertical">
+                <h1>Фигачечная</h1>
+                <h2>Бесплатный сервис по офигачиванию слов</h2>
+                <!-- <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br> -->
+                <!-- <div class="vertical-center">
+
+                </div> -->
+            </div>
             <div class="vertical-center">
                 <input type="text" id="input_phrase" maxlength="256" name="input_phrase"> </input> <button style="font-family: 'Old Standard TT', sans-serif; font-size: 14px" type="submit" onclick="javascript:send()">Офигачить!</button><br>
                 <p id="history" style="color: white; font-family: 'Old Standard TT', sans-serif; font-size: 16px; margin: -10; text-shadow: 3px 3px 5px black;">Например, </p><br><br>
                 <select name="schema_selection" id="schema_selection" style="font-family: 'Old Standard TT', sans-serif; font-size: 14px; margin: -10;"></select><br><br>
                 <p style="color: white; font-family: 'Old Standard TT', sans-serif; font-size: 16px; text-shadow: 3px 3px 5px black; margin: -5;">Схема</p><br><br>
+                <p  id="result" style="color: white; font-family: 'Old Standard TT', sans-serif; font-size: 80px; margin: -10; text-shadow: 3px 3px 5px black;">...</p>
+
             </div>
-            <p  id="result" style="color: white; font-family: 'Old Standard TT', sans-serif; font-size: 80px; margin: -10; text-shadow: 3px 3px 5px black;"></p>
+            <!-- <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br> -->
+
         </div>
         <footer>
             <h3 id="statistics">Нами уже офигачено 15 слов!</h3>

@@ -2,21 +2,26 @@
     min-height: calc(90vh - 60px);
 }
 
+.header-vertical {
+    margin: 0;
+    position: sticky;
+    top: 2%;
+    left: 50%;
+}
+
 .vertical-center {
     margin: 0;
-    position: absolute;
-    top: 50%;
+    position: sticky;
+    top: 40%;
     left: 50%;
-    -ms-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
 }
 
 
 body {
-    width: 80%;
+    width: 99%;
     text-align: center;
-    /* min-height: 90%; */
-    margin: 0 auto;
+    min-width: 50%;
+    margin-top: 0 auto;
 }
   
   /* Typography */
@@ -69,7 +74,9 @@ html {
   
 footer {
     clear: both;
-    position: relative;
-    /* height: 300px; */
-    margin-top: 100px;
+    position: sticky;
+    top: 95%;
+    left: 50%;
+    /* height: 00px; */
+    /* margin-top: 100px; */
 }
