@@ -81,7 +81,7 @@ async def api_figalize_phrase(request: Request, response: Response):
         else:
             history_data = (json.dumps(({'original':request.phrase, 'figalized':figalized_result}), indent = 4, ensure_ascii=False)).encode('utf-8').decode('unicode-escape')
             print (history_data)
-            response = requests.post('http://localhost:9000/api/append/', data = history_data)
+            requests.post('http://localhost:9000/api/append/', data = history_data)
             return {'data': figalized_result}
     else:
         # Если фраза содержит неверные символы, возвращаем код 400 и сообщение об ошибке
