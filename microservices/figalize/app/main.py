@@ -63,13 +63,9 @@ def verify_phrase (phrase):
 
 # Создаём API-интерфейс
 app = FastAPI()
-# Разрешаем обращение к API с любых доменов, так как внутри Kubernetes API будет недоступен снаружи
+# Разрешаем обращение к API с любых доменов
 origins = [
-    "http://figachechnaya.ru",
-    "https://figachechnaya.ru",
-    "http://figachechnaya.ru:8080",
-    "http://localhost",
-    "http://localhost:8080"
+    "*"
 ]
 app.add_middleware(
     CORSMiddleware,
