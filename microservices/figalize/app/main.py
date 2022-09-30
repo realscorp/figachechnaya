@@ -5,13 +5,28 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import requests
 
+system_is_ready = False
 regexp_pattern = "[а-яА-Яеё,. ]+"
 json_path = '/var/config/example.json'
+append_history_url = 'http://localhost:9000/api/append/'
 
 # Создаём свой тип данных, чтобы загружать в него данные из запроса
 class Request(BaseModel):
     schema_id: int
     phrase: str
+
+# Загрузка в память схемы из файла
+def load_schemas (filepath):
+    global system_is_ready
+    try:
+        with open(filepath) as json_file:
+            schema_list = json.load(json_file)
+    except Exception as err:
+        system_is_ready = False
+        print('Cannot load schemas file', err)
+    else:
+        system_is_ready = True
+        return schema_list['schemas']
 
 def figalize (word,substitutions_list):
     # Создаём пустые переменные
@@ -46,12 +61,6 @@ def verify_phrase (phrase):
     match = pattern.fullmatch(phrase)
     return match
 
-# Загрузка в память схемы из файла
-def load_schemas (filepath):
-    with open(filepath) as json_file:
-        schema_list = json.load(json_file)
-        return schema_list['schemas']
-
 # Создаём API-интерфейс
 app = FastAPI()
 # Разрешаем обращение к API с любых доменов, так как внутри Kubernetes API будет недоступен снаружи
@@ -81,7 +90,7 @@ async def api_figalize_phrase(request: Request, response: Response):
         else:
             history_data = (json.dumps(({'original':request.phrase, 'figalized':figalized_result}), indent = 4, ensure_ascii=False)).encode('utf-8').decode('unicode-escape')
             print (history_data)
-            requests.post('http://localhost:9000/api/append/', data = history_data)
+            requests.post(append_history_url, data = history_data)
             return {'data': figalized_result}
     else:
         # Если фраза содержит неверные символы, возвращаем код 400 и сообщение об ошибке
@@ -97,6 +106,17 @@ async def api_getschemas():
         schema_list[count]=schema['name']
         count += 1
     return schema_list
+
+# readinessProbe для Кубернетес
+@app.get("/api/healthz/")
+def get_history(response: Response):
+    global system_is_ready
+    if system_is_ready:
+        response.status_code = status.HTTP_200_OK
+        return
+    else:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return
 
 # Подгружаем схемы фигализации из файла
 schemas = load_schemas(json_path)
