@@ -5,6 +5,7 @@ from pydantic import BaseModel
 import psycopg
 import os
 import time
+from prometheus_client import start_http_server, Summary, Counter, Gauge, Histogram
 
 regexp_pattern = "[а-яА-Яеё,. ]+"
 history_count = 1
@@ -21,6 +22,14 @@ db_connection_string = ('host=' + db_host +
                         ' user=' + db_login +
                         ' password=' + db_pass
                         )
+
+# Инициализируем каунтеры для экспорта метрик
+history_appends_latency_seconds = Histogram('history_appends_latency_seconds', 'Latency histogram for History append request processing')
+history_appends_success_count = Counter('history_appends_success_count', 'Number of times History was succesfully appended')
+history_appends_failed_count = Counter('history_appends_failed_count', 'Number of times History append was failed')
+history_get_latency_seconds = Histogram('history_get_latency_seconds', 'Latency histogram for get History request processing')
+history_get_success_count = Counter('history_get_success_count', 'Number of times get History request appended')
+history_get_failed_count = Counter('history_get_failed_count', 'Number of times get History request was failed')
 
 # Создаём свой тип данных, чтобы загружать в него данные из запроса
 class AppendRequest(BaseModel):
@@ -71,50 +80,60 @@ app.add_middleware(
 # Описываем обработку запроса к API добавления записи в историю
 @app.post("/api/append/", status_code=200)
 async def append_history(appendrequest: AppendRequest, response: Response):
-    global system_is_ready
-    print ('Incoming append request, original ' + appendrequest.original + ', figalized: ' + appendrequest.figalized)
-    # Так как API будет доступно снаружи, делаем проверку на лишние символы для безопасности
-    if not (verify_phrase(appendrequest.original) and verify_phrase(appendrequest.original)):
-        print('Недопустимые символы')
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return
-    # Делаем вставку в таблицу переданных значений
-    try:
-        with psycopg.connect(db_connection_string) as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "INSERT INTO history (original, figalized) VALUES (%s, %s)",
-                    (appendrequest.original, appendrequest.figalized))
-    # В случае сбоя выставляем флаг неготовности системы
-    except:
-        print ('Cannot append to history')
-        system_is_ready = False
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return
-    else:
-        system_is_ready = True
-        return
+    with history_appends_latency_seconds.time():
+        # Получаем доступ к переменной-флагу, объявленной глобально
+        global system_is_ready
+        # Отладочная информация в консоль
+        print ('Incoming append request, original ' + appendrequest.original + ', figalized: ' + appendrequest.figalized)
+        # Так как API будет доступно снаружи, делаем проверку на лишние символы для безопасности
+        if not (verify_phrase(appendrequest.original) and verify_phrase(appendrequest.figalized)):
+            print('Недопустимые символы')
+            history_appends_failed_count.inc()
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return
+        # Делаем вставку в таблицу переданных значений
+        try:
+            with psycopg.connect(db_connection_string) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "INSERT INTO history (original, figalized) VALUES (%s, %s)",
+                        (appendrequest.original, appendrequest.figalized))
+        # В случае сбоя выставляем флаг неготовности системы
+        except:
+            print ('Cannot append to history')
+            system_is_ready = False
+            history_appends_failed_count.inc()
+            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            return
+        else:
+            history_appends_success_count.inc()
+            system_is_ready = True
+            return
+
 # API для запроса списка преобразованных слов из истории. У нас его использует фронтенд для генерации подсказки и отображения статистики
 @app.get("/api/gethistory/", status_code=200)
 def get_history(response: Response):
-    global system_is_ready
-    # Пробуем выполнить запрос к БД
-    try:
-        with psycopg.connect(db_connection_string) as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "SELECT * FROM history ORDER BY id DESC LIMIT %s",
-                    (history_count,))
-                result_list = [list(x) for x in cur.fetchall()]
-    # Если не получилось, выставляем флаг неготовности системы
-    except:
-        print ('Cannot get history')
-        system_is_ready = False
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return
-    else:
-        system_is_ready = True
-        return result_list
+    with history_get_latency_seconds.time():
+        global system_is_ready
+        # Пробуем выполнить запрос к БД
+        try:
+            with psycopg.connect(db_connection_string) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "SELECT * FROM history ORDER BY id DESC LIMIT %s",
+                        (history_count,))
+                    result_list = [list(x) for x in cur.fetchall()]
+        # Если не получилось, выставляем флаг неготовности системы
+        except:
+            print ('Cannot get history')
+            system_is_ready = False
+            history_get_failed_count.inc()
+            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            return
+        else:
+            history_get_success_count.inc()
+            system_is_ready = True
+            return result_list
 
 # readinessProbe для Кубернетес
 @app.get("/api/healthz/")
@@ -131,3 +150,4 @@ def get_history(response: Response):
 # Пока не получится, флаг готовности системы будет false
 while not init_table():
     time.sleep(1)
+start_http_server(9090)
