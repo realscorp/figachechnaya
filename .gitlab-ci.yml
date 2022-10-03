@@ -157,7 +157,7 @@ build/image/front:
     - job: validate/image/front
 
 build/image/figalize:
-  extends: .init-dockerbuild
+  extends: .dockerbuild
   rules:
     - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
       changes: # и в коммите были изменены файлы в каталоге terraform, запускаем джобу автоматически
@@ -171,7 +171,7 @@ build/image/figalize:
     WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/figalize
 
 build/image/history:
-  extends: .init-dockerbuild
+  extends: .dockerbuild
   rules:
     - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
       changes: # и в коммите были изменены файлы в каталоге terraform, запускаем джобу автоматически
