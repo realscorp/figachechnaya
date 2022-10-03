@@ -24,7 +24,7 @@
           exclude = ["registry.terraform.io/*/*"]
         }
       }
-    TERRAFORM_BACKEND: |+
+    TERRAFORM_BACKEND: |
       terraform {
           backend "http" {
         }

@@ -20,7 +20,3 @@ terraform {
         }
     }
 }
-
-provider "helm" {
-  # Configuration options
-}
