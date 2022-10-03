@@ -26,9 +26,8 @@
       }
     TERRAFORM_BACKEND: |
       terraform {
-
-          backend "http" {
-
+        backend "http" {
+          lock_method = "POST"
         }
       }
   before_script:
