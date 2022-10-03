@@ -7,6 +7,7 @@ stages:
   before_script:
     - echo -e "\e[47m\e[0Ksection_start:`date +%s`:env_vars[collapsed=true]\r\e[0KList env vars" # Красивые сворачивающиеся разделы в логе джоба
     - cd $WORKINGDIR_ROOT
+    - cp $KUBECONFIG ~/.kube/config
     - env | sort -f # выводим все немаскированные переменные окружения с целью упрощения отладки. список сортируем
     - echo -e "\e[0Ksection_end:`date +%s`:env_vars\r\e[0K" # Сворачиваем секцию лога
 
@@ -96,3 +97,19 @@ build/terraform:
   needs:
     - job: validate/terraform
       artifacts: true
+
+deploy/terraform:
+  stage: deploy
+  allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
+  extends:
+    - .init-tf
+  script:
+    - echo -e "\e[43m\e[0Ksection_start:`date +%s`:terraform_apply\r\e[0KTerraform - Apply"
+    - gitlab-terraform apply # Применение запускаем согласно созданному ранее плану. Файл переменных не указываем, так
+    - echo -e "\e[0Ksection_end:`date +%s`:terraform_apply\r\e[0K"
+  rules:
+    # Если ветка - main, разрешим ручное выполнение джобы. В противном случае джоба не разрешена.
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      exists:
+        - terraform/**/*
+      when: manual
