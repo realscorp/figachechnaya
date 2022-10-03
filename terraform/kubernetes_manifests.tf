@@ -25,8 +25,8 @@ resource "kubernetes_manifest" "secrets" {
         "type" = "Opaque"
         "data" = {
             # Эти значения мы получим из переменных окружения раннера
-            "db_login" = var.postgresql_db_login,
-            "db_password" = var.postgresql_db_password
+            "db_login" = var.postgresql_db_user,
+            "db_password" = var.postgresql_db_pass
         }
     }
 }
