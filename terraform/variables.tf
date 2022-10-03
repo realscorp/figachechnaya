@@ -59,11 +59,3 @@ variable "az" {
 variable "floating_ip_enabled" {
     type = bool
 }
-##########################
-# Объекты Кубернетес
-variable "postgresql_db_login" {
-    type = string
-}
-variable "postgresql_db_password" {
-    type = string
-}
