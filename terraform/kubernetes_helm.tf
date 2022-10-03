@@ -19,7 +19,7 @@ resource "helm_release" "kube-prometheus-stack" {
     repository = "https://prometheus-community.github.io/helm-charts"
     chart      = "kube-prometheus-stack"
     version    = "40.3.1"
-    values = file("helm/kube-prometheus-stack.yml")
+    values     = [file("helm/kube-prometheus-stack.yml")]
 
     depends_on = [mcs_kubernetes_node_group.nodegroup]
 }
