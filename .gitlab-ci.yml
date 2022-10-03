@@ -7,8 +7,6 @@ stages:
   before_script:
     - echo -e "\e[47m\e[0Ksection_start:`date +%s`:env_vars[collapsed=true]\r\e[0KList env vars" # Красивые сворачивающиеся разделы в логе джоба
     - cd $WORKINGDIR_ROOT
-    - mkdir ~/.kube
-    - cp $KUBECONFIG ~/.kube/config
     - env | sort -f # выводим все немаскированные переменные окружения с целью упрощения отладки. список сортируем
     - echo -e "\e[0Ksection_end:`date +%s`:env_vars\r\e[0K" # Сворачиваем секцию лога
 
@@ -40,6 +38,8 @@ stages:
       }
   before_script:
     - !reference [.init, before_script] # Добавляем before_script из init через reference, потому что по другому массивы в Гитлабе не мерджатся
+    - mkdir ~/.kube
+    - base64 -d $KUBECONFIG > ~/.kube/config
     - echo -e "\e[42m\e[0Ksection_start:`date +%s`:init_before_script[collapsed=true]\r\e[0KInit - Before script" # Красивые сворачивающиеся разделы в логе джоба
     - echo $TERRAFORMRC > ~/.terraformrc # Настраиваем раннер на обход блокировки, которую устроил Hashicorp
     # Настраиваем ssh: копируем из переменных закрытую и создаём открытую часть, чтобы потом создавать ключевые пары в облаке и инстансы с этими ключами
@@ -90,7 +90,7 @@ build/terraform:
   rules:
     - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
       changes: # и в коммите были изменены файлы в каталоге terraform, запускаем джобу автоматически
-        - terraform/*/*.tf
+        - terraform/**/*
       when: always
     - exists: # В противном случае - запускаем вручную
         - terraform/*
@@ -117,3 +117,72 @@ deploy/terraform:
   needs:
     - job: build/terraform
       artifacts: true
+
+validate/image/front:
+  stage: validate
+  allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
+  image: pipelinecomponents/hadolint:0.23.3
+  variables:
+    WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/frontend
+  script:
+    - cd $WORKINGDIR_ROOT
+    - hadolint Dockerfile
+
+build/image/front:
+  stage: build
+  allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
+  rules:
+    - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
+      changes: # и в коммите были изменены файлы в каталоге terraform, запускаем джобу автоматически
+        - frontend/**/*
+      when: always
+    - exists: # В противном случае - запускаем вручную
+        - frontend/*
+      when: manual
+  variables:
+    IMAGE_TAG: realscorp/front:1.0.0
+    WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/frontend
+  script:
+    - cd $WORKINGDIR_ROOT
+    - docker build -t=$IMAGE_TAG .
+    - docker push $IMAGE_TAG
+  needs:
+    - job: validate/image/front
+
+build/image/figalize:
+  stage: build
+  allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
+  rules:
+    - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
+      changes: # и в коммите были изменены файлы в каталоге terraform, запускаем джобу автоматически
+        - microservices/figalize/**/*
+      when: always
+    - exists: # В противном случае - запускаем вручную
+        - microservices/figalize/**/*
+      when: manual
+  variables:
+    IMAGE_TAG: realscorp/figalize:1.0.0
+    WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/figalize
+  script:
+    - cd $WORKINGDIR_ROOT
+    - docker build -t=$IMAGE_TAG .
+    - docker push $IMAGE_TAG
+
+build/image/history:
+  stage: build
+  allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
+  rules:
+    - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
+      changes: # и в коммите были изменены файлы в каталоге terraform, запускаем джобу автоматически
+        - microservices/history/**/*
+      when: always
+    - exists: # В противном случае - запускаем вручную
+        - microservices/history/**/*
+      when: manual
+  variables:
+    IMAGE_TAG: realscorp/history:1.0.0
+    WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/history
+  script:
+    - cd $WORKINGDIR_ROOT
+    - docker build -t=$IMAGE_TAG .
+    - docker push $IMAGE_TAG
