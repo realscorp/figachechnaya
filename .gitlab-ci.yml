@@ -52,6 +52,15 @@ stages:
     - ssh-keygen -y -f $HOME/.ssh/id_rsa > $HOME/.ssh/id_rsa.pub # генерируем из закрытой открытую часть, которая пригодится для создания инстасов с ключевой парой
     - echo -e "\e[0Ksection_end:`date +%s`:init_before_script\r\e[0K" # Сворачиваем секцию лога
 
+.init-dockerbuild:
+  image: docker:22.06-rc-dind
+  stage: build
+  allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
+  script:
+    - cd $WORKINGDIR_ROOT
+    - docker build -t=$IMAGE_TAG .
+    - docker push $IMAGE_TAG
+
 validate/terraform:
   stage: validate
   allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
@@ -129,8 +138,7 @@ validate/image/front:
     - hadolint Dockerfile
 
 build/image/front:
-  stage: build
-  allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
+  extends: .init-dockerbuild
   rules:
     - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
       changes: # и в коммите были изменены файлы в каталоге terraform, запускаем джобу автоматически
@@ -142,16 +150,11 @@ build/image/front:
   variables:
     IMAGE_TAG: realscorp/front:1.0.0
     WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/frontend
-  script:
-    - cd $WORKINGDIR_ROOT
-    - docker build -t=$IMAGE_TAG .
-    - docker push $IMAGE_TAG
   needs:
     - job: validate/image/front
 
 build/image/figalize:
-  stage: build
-  allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
+  extends: .init-dockerbuild
   rules:
     - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
       changes: # и в коммите были изменены файлы в каталоге terraform, запускаем джобу автоматически
@@ -163,14 +166,9 @@ build/image/figalize:
   variables:
     IMAGE_TAG: realscorp/figalize:1.0.0
     WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/figalize
-  script:
-    - cd $WORKINGDIR_ROOT
-    - docker build -t=$IMAGE_TAG .
-    - docker push $IMAGE_TAG
 
 build/image/history:
-  stage: build
-  allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
+  extends: .init-dockerbuild
   rules:
     - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
       changes: # и в коммите были изменены файлы в каталоге terraform, запускаем джобу автоматически
@@ -182,7 +180,3 @@ build/image/history:
   variables:
     IMAGE_TAG: realscorp/history:1.0.0
     WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/history
-  script:
-    - cd $WORKINGDIR_ROOT
-    - docker build -t=$IMAGE_TAG .
-    - docker push $IMAGE_TAG
