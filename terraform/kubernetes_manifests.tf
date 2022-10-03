@@ -1,31 +1,8 @@
 # Деплоим из yaml-файлов
 ##########################
-resource "kubernetes_manifest" "ingress" {
-    manifest = yamldecode(file("../kubernetes/manifests/ingress.yml"))
-    depends_on = [mcs_kubernetes_node_group.nodegroup]
-}
-resource "kubernetes_manifest" "front" {
-    manifest = yamldecode(file("../kubernetes/manifests/front.yml"))
-    wait {
-        condition {
-            type   = "ContainersReady"
-            status = "True"
-        }
-    }
-    depends_on = [mcs_kubernetes_node_group.nodegroup]
-}
-resource "kubernetes_manifest" "figalize" {
-    manifest = yamldecode(file("../kubernetes/manifests/figalize.yml"))
-    wait {
-        condition {
-            type   = "ContainersReady"
-            status = "True"
-        }
-    }
-    depends_on = [mcs_kubernetes_node_group.nodegroup]
-}
-resource "kubernetes_manifest" "history" {
-    manifest = yamldecode(file("../kubernetes/manifests/history.yml"))
+resource "kubernetes_manifest" "manifest" {
+    for_each = fileset("${path.module}/../kubernetest/manifests/", "**.yml")
+    manifest = yamldecode(file(each.value))
     wait {
         condition {
             type   = "ContainersReady"
