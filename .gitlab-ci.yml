@@ -64,14 +64,14 @@ stages:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t=$CI_REGISTRY/$CI_PROJECT_PATH/$IMAGE_TAG .
     - docker push $CI_REGISTRY/$CI_PROJECT_PATH/$IMAGE_TAG
-  rules:
-    - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
-      changes: # и в коммите были изменены файлы в каталоге сервиса, запускаем джобу автоматически
-        - $CODE_DIR/**/*
-      when: always
-    - exists: # В противном случае - запускаем вручную
-        - $CODE_DIR/**/*
-      when: manual
+  # rules:
+  #   - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
+  #     changes: # и в коммите были изменены файлы в каталоге сервиса, запускаем джобу автоматически
+  #       - $CODE_DIR/**/*
+  #     when: always
+  #   - exists: # В противном случае - запускаем вручную
+  #       - $CODE_DIR/**/*
+  #     when: manual
 
 validate/terraform:
   stage: validate
