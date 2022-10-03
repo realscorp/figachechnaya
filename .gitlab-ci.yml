@@ -93,3 +93,6 @@ build/terraform:
     - exists: # В противном случае - запускаем вручную
         - terraform/*
       when: manual
+  needs:
+    - job: validate/terraform
+      artifacts: true
