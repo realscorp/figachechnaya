@@ -9,9 +9,6 @@ spec:
     app: figalize
   type: ClusterIP
   sessionAffinity: None
-  sessionAffinityConfig:
-    clientIP:
-      timeoutSeconds: 10800
   ports:
   - name: http
     protocol: TCP
