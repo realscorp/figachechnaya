@@ -1,7 +1,7 @@
 stages:
   - validate
-  - build
-  - deploy
+  # - build
+  # - deploy
 
 .init:
   before_script:
@@ -43,7 +43,7 @@ stages:
   stage: validate
   allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
   extends:
-    - .tf-init
+    - .init-tf
   script:
     - echo -e "\e[44m\e[0Ksection_start:`date +%s`:terraform_validate[collapsed=true]\r\e[0KTerraform - Validate" # Красивые сворачивающиеся разделы в логе джоба
     - gitlab-terraform init -reconfigure # На этом этапе Терраформ скачивает все модули и провайдеры, которые потом сохранятся в кэш
