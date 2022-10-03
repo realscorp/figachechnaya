@@ -3,12 +3,6 @@
 resource "kubernetes_manifest" "manifest" {
     for_each = fileset(path.module, "../kubernetes/manifests/**/*.yml")
     manifest = yamldecode(file(each.value))
-    wait {
-        condition {
-            type   = "ContainersReady"
-            status = "True"
-        }
-    }
     depends_on = [mcs_kubernetes_node_group.nodegroup]
 }
 
