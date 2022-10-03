@@ -10,5 +10,5 @@ resource "helm_release" "certmanager" {
         name  = "installCRDs"
         value = "true"
     }
-
+    depends_on = [mcs_kubernetes_node_group.nodegroup]
 }
