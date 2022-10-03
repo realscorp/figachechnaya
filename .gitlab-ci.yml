@@ -155,6 +155,7 @@ build/image/front:
     WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/frontend
   script:
     - !reference [.dockerbuild, script]
+    - echo Running
   needs:
     - job: validate/image/front
 
