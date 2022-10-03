@@ -113,3 +113,6 @@ deploy/terraform:
       exists:
         - terraform/**/*
       when: manual
+  needs:
+    - job: build/terraform
+      artifacts: true
