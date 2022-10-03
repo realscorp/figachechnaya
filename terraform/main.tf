@@ -1,6 +1,8 @@
 # Настройки для доступа к API Openstack в облаке провайдера VK задаются через переменные окружения, см. env-setup-example.sh
 
 terraform {
+    backend "http" {
+    }
     required_providers {
         openstack = {
         source = "terraform-provider-openstack/openstack"
