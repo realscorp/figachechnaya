@@ -1,6 +1,6 @@
 # Фигачечная
-https://figachechnaya.ru - сайт
-https://figachechnaya.ru/grafana - метрики и логи *(user:o66Vsxt7PZbpQC_PYvWL59rNBkRcWMPA)*
+https://figachechnaya.ru - сайт  
+https://figachechnaya.ru/grafana - метрики и логи *(user:o66Vsxt7PZbpQC_PYvWL59rNBkRcWMPA)*  
 https://gitlab.com/realscorp/figachechnaya - пайплайн
 ## Что это и зачем
 **Фигачечная** - простой сервис по офигачиванию слов (*Велосипед -> Фигасипед*).  
