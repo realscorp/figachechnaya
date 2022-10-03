@@ -1,7 +1,7 @@
 # Деплоим из yaml-файлов
 ##########################
 resource "kubernetes_manifest" "manifest" {
-    for_each = fileset("${path.module}/../kubernetes/manifests/", "**.yml")
+    for_each = fileset(path.module, "../kubernetes/manifests/**/*.yml")
     manifest = yamldecode(file(each.value))
     wait {
         condition {
