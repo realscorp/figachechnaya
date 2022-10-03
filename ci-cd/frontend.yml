@@ -2,14 +2,14 @@
   extends: .init
   variables:
     CODE_DIR: 'frontend'
-    WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/frontend
+    WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/${CODE_DIR}
   rules:
     - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
       changes: # и в коммите были изменены файлы в каталоге сервиса, запускаем джобу автоматически
-        - frontend/**/*
+        - ${CODE_DIR}/**/*
       when: always
     - exists: # В противном случае - запускаем вручную
-        - frontend/**/*
+        - ${CODE_DIR}/**/*
       when: manual
 
 validate/image/front:
@@ -18,6 +18,7 @@ validate/image/front:
   allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
   image: pipelinecomponents/hadolint:0.23.3
   script:
+    - echo
     - cd $WORKINGDIR_ROOT
     - hadolint Dockerfile
 
