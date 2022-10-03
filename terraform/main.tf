@@ -14,5 +14,13 @@ terraform {
             source = "vk-cs/vkcs"
             version = "~> 0.1.0"
         }
+        helm = {
+            source = "hashicorp/helm"
+            version = "2.7.0"
+        }
     }
+}
+
+provider "helm" {
+  # Configuration options
 }
