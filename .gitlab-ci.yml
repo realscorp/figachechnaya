@@ -1,4 +1,4 @@
 include:
   - local: "/ci-cd/init.yml"
-  - local: "/ci-cd/application.yml"
+  - local: "/ci-cd/frontend.yml"
   - local: "/ci-cd/terraform.yml"
