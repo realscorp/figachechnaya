@@ -42,7 +42,7 @@
 
 validate/terraform:
   stage: validate
-  allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
+  # allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
   extends:
     - .init-tf
   script:
