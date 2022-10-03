@@ -11,6 +11,7 @@ resource "kubernetes_manifest" "front" {
             type   = "ContainersReady"
             status = "True"
         }
+    }
     depends_on = [mcs_kubernetes_node_group.nodegroup]
 }
 resource "kubernetes_manifest" "figalize" {
@@ -20,6 +21,7 @@ resource "kubernetes_manifest" "figalize" {
             type   = "ContainersReady"
             status = "True"
         }
+    }
     depends_on = [mcs_kubernetes_node_group.nodegroup]
 }
 resource "kubernetes_manifest" "history" {
@@ -29,6 +31,7 @@ resource "kubernetes_manifest" "history" {
             type   = "ContainersReady"
             status = "True"
         }
+    }
     depends_on = [mcs_kubernetes_node_group.nodegroup]
 }
 
