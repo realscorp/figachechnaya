@@ -1,0 +1,59 @@
+stages:
+  - validate
+  - build
+  - deploy
+
+.init:
+  before_script:
+    - echo -e "\e[47m\e[0Ksection_start:`date +%s`:env_vars[collapsed=true]\r\e[0KList env vars" # Красивые сворачивающиеся разделы в логе джоба
+    - cd $WORKINGDIR_ROOT
+    - env | sort -f # выводим все немаскированные переменные окружения с целью упрощения отладки. список сортируем
+    - echo -e "\e[0Ksection_end:`date +%s`:env_vars\r\e[0K" # Сворачиваем секцию лога
+
+.init-tf:
+  extends:
+    .init
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  variables:
+    WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/terraform
+    # Общие настройки доступа ко всем облачным проектам
+    OS_IDENTITY_API_VERSION: 3
+    OS_AUTH_URL: "https://infra.mail.ru:35357/v3/"
+    OS_REGION_NAME: "RegionOne"
+    OS_USER_DOMAIN_NAME: "users"
+    # Настройки Gitlab managed Terraform state
+    TF_HTTP_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_PROJECT_ID}
+    TF_HTTP_LOCK_ADDRESS: ${TF_HTTP_ADDRESS}/lock # Адрес для блокировки стейта при выполнии plan или apply
+    TF_HTTP_UNLOCK_ADDRESS: ${TF_HTTP_ADDRESS}/lock
+    TF_HTTP_LOCK_METHOD: "POST" # метод блокировки, валидный для Gitlab-managed state
+  before_script:
+    - !reference [.init, before_script] # Добавляем before_script из init через reference, потому что по другому массивы в Гитлабе не мерджатся
+    - echo -e "\e[42m\e[0Ksection_start:`date +%s`:init_before_script[collapsed=true]\r\e[0KInit - Before script" # Красивые сворачивающиеся разделы в логе джоба
+    # Настраиваем ssh: копируем из переменных закрытую и создаём открытую часть, чтобы потом создавать ключевые пары в облаке и инстансы с этими ключами
+    - "command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )" # проверяем, что ssh-agent есть в образе
+    - mkdir -p ~/.ssh # готовим каталог под хранение ключей
+    - echo "${SSH_KEY}" | base64 -d > $HOME/.ssh/id_rsa # Разворачиваем из переменных приватный ssh-ключ проекта, который был закодирован BASE64, чтобы работала маскировка
+    - chmod -R 700 ~/.ssh
+    - eval $(ssh-agent -s) # запускаем ssh-agent, чтобы он был в памяти
+    - ssh-add $HOME/.ssh/id_rsa # добавляем ключ в ssh
+    - ssh-keygen -y -f $HOME/.ssh/id_rsa > $HOME/.ssh/id_rsa.pub # генерируем из закрытой открытую часть, которая пригодится для создания инстасов с ключевой парой
+    - echo -e "\e[0Ksection_end:`date +%s`:init_before_script\r\e[0K" # Сворачиваем секцию лога
+
+.validate/terraform:
+  stage: validate
+  allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
+  extends:
+    - .tf-init
+  script:
+    - echo -e "\e[44m\e[0Ksection_start:`date +%s`:terraform_validate[collapsed=true]\r\e[0KTerraform - Validate" # Красивые сворачивающиеся разделы в логе джоба
+    - gitlab-terraform init -reconfigure # На этом этапе Терраформ скачивает все модули и провайдеры, которые потом сохранятся в кэш
+    - gitlab-terraform validate # Валидируем. Эта команда не принимает указание на файлы переменных, поэтому без них
+    - echo -e "\e[0Ksection_end:`date +%s`:terraform_validate\r\e[0K"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
+      changes: # и в коммите были изменены файлы в каталоге terraform, запускаем джобу автоматически
+        - terraform/**/*
+      when: always
+    - exists: # В противном случае - запускаем вручную
+        - terraform/**/*
+      when: manual
