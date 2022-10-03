@@ -1,0 +1,9 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: figalize-env
+  namespace: default
+data:
+  HISTORY_APPEND_URL: http://history:8000/api/append/
+  METRICS_PORT_FIGALIZE: '9090'

@@ -1,0 +1,11 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: history-env
+  namespace: default
+data:
+  DB_HOST: 'postgresql.mcs.local'
+  DB_PORT: '5432'
+  DB_NAME: history
+  METRICS_PORT_HISTORY: '9000'

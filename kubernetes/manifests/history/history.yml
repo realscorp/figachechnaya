@@ -1,15 +1,4 @@
 ---
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: history-env
-  namespace: default
-data:
-  DB_HOST: 'postgresql.mcs.local'
-  DB_PORT: '5432'
-  DB_NAME: history
-  METRICS_PORT_HISTORY: '9000'
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -86,22 +75,3 @@ spec:
         - containerPort: 8000
           name:  api
       restartPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: history
-  namespace: default
-spec:
-  selector:
-    app: history
-  type: ClusterIP
-  sessionAffinity: None
-  sessionAffinityConfig:
-    clientIP:
-      timeoutSeconds: 10800
-  ports:
-  - name: http
-    protocol: TCP
-    port: 8000
-    targetPort: 8000

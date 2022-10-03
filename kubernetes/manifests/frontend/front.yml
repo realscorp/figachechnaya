@@ -1,21 +1,4 @@
 ---
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: front
-  namespace: default
-data:
-  front.conf: |
-    server {
-      listen 80;
-      server_name figachechnaya.ru;
-      root /var/www/html;
-      index index.html;
-      location / {
-        try_files $uri $uri/ =404;
-      }
-    }
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -68,22 +51,3 @@ spec:
           configMap:
             name: front
       restartPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: front
-  namespace: default
-spec:
-  selector:
-    app: front
-  type: ClusterIP
-  sessionAffinity: None
-  sessionAffinityConfig:
-    clientIP:
-      timeoutSeconds: 10800
-  ports:
-  - name: http
-    protocol: TCP
-    port: 80
-    targetPort: 80

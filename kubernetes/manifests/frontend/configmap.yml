@@ -1,0 +1,17 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: front
+  namespace: default
+data:
+  front.conf: |
+    server {
+      listen 80;
+      server_name figachechnaya.ru;
+      root /var/www/html;
+      index index.html;
+      location / {
+        try_files $uri $uri/ =404;
+      }
+    }

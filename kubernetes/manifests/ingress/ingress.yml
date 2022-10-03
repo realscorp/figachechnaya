@@ -61,17 +61,3 @@ spec:
             port:
               number: 8000
 ---
-apiVersion: cert-manager.io/v1
-kind: Issuer
-metadata:
-  name: letsencrypt
-spec:
-  acme:
-    email: realscorp@outlook.com
-    server: https://acme-v02.api.letsencrypt.org/directory
-    privateKeySecretRef:
-      name: letsencrypt
-    solvers:
-    - http01:
-        ingress:
-          class: nginx
