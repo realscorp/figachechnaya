@@ -1,7 +1,7 @@
 stages:
   - validate
   - build
-  # - deploy
+  - deploy
 
 .init:
   before_script:
