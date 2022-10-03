@@ -73,7 +73,11 @@ def verify_phrase (phrase):
     return match
 
 # Создаём API-интерфейс
-app = FastAPI()
+app = FastAPI(
+    openapi_url = "/api/figalize/openapi.json",
+    docs_url="/api/figalize/docs"
+
+)
 # Разрешаем обращение к API с любых доменов
 origins = [
     "*"

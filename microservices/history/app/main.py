@@ -65,7 +65,11 @@ def verify_phrase (phrase):
     return match
 
 # Создаём API-интерфейс
-app = FastAPI()
+app = FastAPI(
+    # Так как API работает через ревер-прокси ингресса, необходимо поменять пути для автодокументации
+    openapi_url = "/api/history/openapi.json",
+    docs_url="/api/history/docs"
+)
 # Разрешаем обращение к API с любых доменов, так как внутри Kubernetes API будет недоступен снаружи
 origins = [
     "*"

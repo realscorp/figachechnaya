@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
       - name: history
-        image: realscorp/history:0.3
+        image: realscorp/history:0.3.1
         resources:
           requests:
             cpu: 200m

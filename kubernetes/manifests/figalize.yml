@@ -98,7 +98,7 @@ spec:
     spec:
       containers:
       - name:  figalize
-        image:  realscorp/figalize:0.3.1
+        image:  realscorp/figalize:0.3.2
         resources:
           requests:
             cpu: 200m

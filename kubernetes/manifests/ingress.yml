@@ -53,6 +53,13 @@ spec:
             name: history
             port:
               number: 8000
+      - path: /docs
+        pathType: Prefix
+        backend:
+          service:
+            name: history
+            port:
+              number: 8000
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer
