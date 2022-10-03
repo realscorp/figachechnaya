@@ -1,4 +1,8 @@
+# Во вложенных джобах местами напрашивается переиспользование кода в Rules, но, как выяснилось, в текущей версии Gitlab есть баг
+# https://gitlab.com/gitlab-org/gitlab/-/issues/351764
 include:
   - local: "/ci-cd/init.yml"
   - local: "/ci-cd/frontend.yml"
+  - local: "/ci-cd/figalize.yml"
+  - local: "/ci-cd/history.yml"
   - local: "/ci-cd/terraform.yml"
