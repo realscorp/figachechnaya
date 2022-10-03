@@ -26,9 +26,20 @@ stages:
     TF_HTTP_LOCK_ADDRESS: ${TF_HTTP_ADDRESS}/lock # Адрес для блокировки стейта при выполнии plan или apply
     TF_HTTP_UNLOCK_ADDRESS: ${TF_HTTP_ADDRESS}/lock
     TF_HTTP_LOCK_METHOD: "POST" # метод блокировки, валидный для Gitlab-managed state
+    TERRAFORMRC: |
+      provider_installation {
+        network_mirror {
+          url = "https://registry.comcloud.xyz/"
+          include = ["registry.terraform.io/*/*"]
+        }
+        direct {
+          exclude = ["registry.terraform.io/*/*"]
+        }
+      }
   before_script:
     - !reference [.init, before_script] # Добавляем before_script из init через reference, потому что по другому массивы в Гитлабе не мерджатся
     - echo -e "\e[42m\e[0Ksection_start:`date +%s`:init_before_script[collapsed=true]\r\e[0KInit - Before script" # Красивые сворачивающиеся разделы в логе джоба
+    - echo $TERRAFORMRC > ~/.terraformrc
     # Настраиваем ssh: копируем из переменных закрытую и создаём открытую часть, чтобы потом создавать ключевые пары в облаке и инстансы с этими ключами
     - "command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )" # проверяем, что ssh-agent есть в образе
     - mkdir -p ~/.ssh # готовим каталог под хранение ключей
