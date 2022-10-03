@@ -52,7 +52,7 @@ stages:
     - ssh-keygen -y -f $HOME/.ssh/id_rsa > $HOME/.ssh/id_rsa.pub # генерируем из закрытой открытую часть, которая пригодится для создания инстасов с ключевой парой
     - echo -e "\e[0Ksection_end:`date +%s`:init_before_script\r\e[0K" # Сворачиваем секцию лога
 
-.init-dockerbuild:
+.dockerbuild:
   extends: .init
   image: docker:22.06-rc-dind
   stage: build
@@ -60,8 +60,16 @@ stages:
   script:
     - cd $WORKINGDIR_ROOT
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -t=$CI_REGISTRY/CI_PROJECT_PATH/$IMAGE_TAG .
-    - docker push $CI_REGISTRY/CI_PROJECT_PATH/$IMAGE_TAG
+    - docker build -t=$CI_REGISTRY/$CI_PROJECT_PATH/$IMAGE_TAG .
+    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/$IMAGE_TAG
+  rules:
+    - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
+      changes: # и в коммите были изменены файлы в каталоге сервиса, запускаем джобу автоматически
+        - $WORKINGDIR_ROOT/**/*
+      when: always
+    - exists: # В противном случае - запускаем вручную
+        - $WORKINGDIR_ROOT/*
+      when: manual
 
 validate/terraform:
   stage: validate
@@ -141,15 +149,7 @@ validate/image/front:
     - hadolint Dockerfile
 
 build/image/front:
-  extends: .init-dockerbuild
-  rules:
-    - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
-      changes: # и в коммите были изменены файлы в каталоге terraform, запускаем джобу автоматически
-        - frontend/**/*
-      when: always
-    - exists: # В противном случае - запускаем вручную
-        - frontend/*
-      when: manual
+  extends: .dockerbuild
   variables:
     IMAGE_TAG: front:1.0.0
     WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/frontend
