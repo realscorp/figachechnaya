@@ -39,7 +39,7 @@ stages:
     - ssh-keygen -y -f $HOME/.ssh/id_rsa > $HOME/.ssh/id_rsa.pub # генерируем из закрытой открытую часть, которая пригодится для создания инстасов с ключевой парой
     - echo -e "\e[0Ksection_end:`date +%s`:init_before_script\r\e[0K" # Сворачиваем секцию лога
 
-.validate/terraform:
+validate/terraform:
   stage: validate
   allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
   extends:
