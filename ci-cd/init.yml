@@ -1,0 +1,11 @@
+stages:
+  - validate
+  - build
+  - deploy
+
+.init:
+  before_script:
+    - echo -e "\e[47m\e[0Ksection_start:`date +%s`:env_vars[collapsed=true]\r\e[0KList env vars" # Красивые сворачивающиеся разделы в логе джоба
+    - cd $WORKINGDIR_ROOT
+    - env | sort -f # выводим все немаскированные переменные окружения с целью упрощения отладки. список сортируем
+    - echo -e "\e[0Ksection_end:`date +%s`:env_vars\r\e[0K" # Сворачиваем секцию лога
