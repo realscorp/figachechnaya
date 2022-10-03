@@ -52,10 +52,10 @@ build/image/front:
   rules:
     - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
       changes: # и в коммите были изменены файлы в каталоге сервиса, запускаем джобу автоматически
-        - $CODE_DIR/**/*
+        - frontend/**/*
       when: always
     - exists: # В противном случае - запускаем вручную
-        - $CODE_DIR/**/*
+        - frontend/**/*
       when: manual
   needs:
     - job: validate/image/front
