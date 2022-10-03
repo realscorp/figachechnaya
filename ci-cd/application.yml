@@ -48,14 +48,14 @@ build/image/front:
   extends: .dockerbuild
   variables:
     IMAGE_TAG: front:1.0.0
-    CODE_DIR: frontend
+    CODE_DIR: 'frontend'
   rules:
     - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
       changes: # и в коммите были изменены файлы в каталоге сервиса, запускаем джобу автоматически
-        - frontend/**/*
+        - $CODE_DIR/**/*
       when: always
     - exists: # В противном случае - запускаем вручную
-        - frontend/**/*
+        - $CODE_DIR/**/*
       when: manual
   needs:
     - job: validate/image/front
