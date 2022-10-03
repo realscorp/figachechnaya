@@ -68,3 +68,28 @@ validate/terraform:
     - exists: # В противном случае - запускаем вручную
         - terraform/**/*
       when: manual
+
+build/terraform:
+  stage: build
+  allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
+  extends:
+    - .init-tf
+  script:
+    - echo -e "\e[43m\e[0Ksection_start:`date +%s`:terraform_plan\r\e[0KTerraform - Plan"
+    - gitlab-terraform plan # План 
+    - gitlab-terraform plan-json # Тот же план, но с выводом в json для отчёта в Gitlab
+    - echo -e "\e[0Ksection_end:`date +%s`:terraform_plan\r\e[0K"
+  artifacts: # С помощью механизма артефактов мы передаём в следующую джобу файлы с планом
+    name: ${PLAN}
+    paths:
+      - ${WORKINGDIR_ROOT}/plan.cache
+    reports:
+      terraform: ${WORKINGDIR_ROOT}/plan.json
+  rules:
+    - if: '$CI_PIPELINE_SOURCE != "web"' # Если пайп запущен не вручную через веб-фейс
+      changes: # и в коммите были изменены файлы в каталоге terraform, запускаем джобу автоматически
+        - terraform/*/*.tf
+      when: always
+    - exists: # В противном случае - запускаем вручную
+        - terraform/*
+      when: manual
