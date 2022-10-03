@@ -153,6 +153,8 @@ build/image/front:
   variables:
     IMAGE_TAG: front:1.0.0
     WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/frontend
+  script:
+    - !reference [.dockerbuild, script]
   needs:
     - job: validate/image/front
 
