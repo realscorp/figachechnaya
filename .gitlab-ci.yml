@@ -151,7 +151,7 @@ build/image/front:
         - $WORKINGDIR_ROOT/**/*
       when: always
     - exists: # В противном случае - запускаем вручную
-        - $WORKINGDIR_ROOT/*
+        - $WORKINGDIR_ROOT/**/*
       when: manual
   needs:
     - job: validate/image/front
