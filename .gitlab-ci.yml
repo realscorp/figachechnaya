@@ -53,7 +53,7 @@ stages:
     - echo -e "\e[0Ksection_end:`date +%s`:init_before_script\r\e[0K" # Сворачиваем секцию лога
 
 .init-dockerbuild:
-  image: docker:22.06-rc-dind-rootless
+  image: docker:22.06-rc-dind
   stage: build
   allow_failure: true # без этого пайплайн будет постоянно висеть в статусе blocked или running
   script:
