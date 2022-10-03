@@ -35,8 +35,7 @@
     - base64 -d $KUBECONFIG > ~/.kube/config
     - echo -e "\e[42m\e[0Ksection_start:`date +%s`:init_before_script[collapsed=true]\r\e[0KInit - Before script" # Красивые сворачивающиеся разделы в логе джоба
     - echo $TERRAFORMRC > ~/.terraformrc # Настраиваем раннер на обход блокировки, которую устроил Hashicorp
-    - echo $TERRAFORM_BACKEND > $WORKINGDIR_ROOT/_backend.tf # Включаем Gitlab-managed backend для хранения стейта
-    - cat $WORKINGDIR_ROOT/_backend.tf
+    - echo $TERRAFORM_BACKEND >> $WORKINGDIR_ROOT/main.tf # Включаем Gitlab-managed backend для хранения стейта
     # Настраиваем ssh: копируем из переменных закрытую и создаём открытую часть, чтобы потом создавать ключевые пары в облаке и инстансы с этими ключами
     - "command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )" # проверяем, что ssh-agent есть в образе
     - mkdir -p ~/.ssh # готовим каталог под хранение ключей
