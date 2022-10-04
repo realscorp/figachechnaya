@@ -150,17 +150,14 @@ alertmanager:
     logLevel: info
     replicas: 1
     retention: 120h
-    storage: {}
-    volumeClaimTemplate:
-      spec:
-        storageClassName: csi-ceph-ssd-ms1
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 1Gi
-        selector:
-          matchLabels:
-            app.kubernetes.io/name: alertmanager
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: csi-ceph-ssd-ms1
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 1Gi
     securityContext:
       runAsGroup: 2000
       runAsNonRoot: true
