@@ -1,7 +1,7 @@
 # Фигачечная
 https://figachechnaya.ru - сайт  
-https://figachechnaya.ru/grafana - метрики и логи *(user:o66Vsxt7PZbpQC_PYvWL59rNBkRcWMPA)*  
-https://gitlab.com/realscorp/figachechnaya - пайплайн
+https://grafana.figachechnaya.ru - метрики и логи *(user:o66Vsxt7PZbpQC_PYvWL59rNBkRcWMPA)*  
+Репозиторий автоматически зеркалируется из https://gitlab.com/realscorp/figachechnaya, потому что так удобнее разрабатывать пайплайн
 ## Что это и зачем
 **Фигачечная** - простой сервис по офигачиванию слов (*Велосипед -> Фигасипед*).  
 Для меня это тренировка, чтобы обновить, закрепить и показать навыки:
@@ -67,14 +67,23 @@ https://gitlab.com/realscorp/figachechnaya - пайплайн
 API доступен из интернета, и автоматически построенную OpenAPI-документацию можно посмотреть здесь:
 - Figalize: https://figachechnaya.ru/api/figalize/docs
 - History: https://figachechnaya.ru/api/history/docs
-## Уже сделано
-!! todo
-## Нужно сделать
-- CI/CD-пайплайн
+## Сделано
+- Написан простой фронтенд на HTML+CSS+JS
+- Написаны RESTful stateless-микросервисы на Python + FastAPI с хранением данных в БД PostgreSQL
+- Микросервисы экспортируют метрики в Prometheus-формате
+- Написан инфраструктурный Terraform-код (облачные сетевые объекты, DBaaS, K8s-кластер, деплой приложений и helm-чартов в K8s)
+- Написан Gitlab-CI пайплайн для разворачивания всего сервиса из кода (Validate -> Build -> Deploy)
+- Сервисы получают сертификаты через cert-manager
+- Сервисы частично умеют в graceful degradation
+- В кластер деплоится Prometheus-stack для сбора метрик и визуализации
+## Todo
+- Доработки для мониторинга (провижининг конфигурации из кода)
 - Упаковка приложения в Helm-чарт
 - Управление резервными копиями БД
-- Линтинг для Python
-- Юнит-тесты для Python
+- Линтинг для Python на шаге Validate
+- Добавить шаг с юнит-тестами для Python
+- Автоматическое управление релизами
+- Сбор логов в Loki
 ## Не сделано и в планах нет
 - Доработка фронтенда и линтер HTML+CSS+JS на шаге Validate: слишком нерелевантный навык для меня
 - Автотесты HTML+CSS+JS
