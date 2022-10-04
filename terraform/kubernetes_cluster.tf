@@ -35,6 +35,6 @@ resource "mcs_kubernetes_node_group" "nodegroup" {
 data "mcs_kubernetes_cluster" "cluster" {
     cluster_id                = mcs_kubernetes_cluster.cluster.id
 }
-output "k8s_config" {
-    value = data.mcs_kubernetes_cluster.cluster.k8s_config
-}
+# output "k8s_config" {
+#     value = data.mcs_kubernetes_cluster.cluster.k8s_config
+# }
