@@ -25,11 +25,12 @@ resource "helm_release" "kube-prometheus-stack" {
     # Забираем настоящие пароли из CI/CD-переменных
     set {
         name  = "alertmanager.extraSecret.data.auth"
-        value = "admin:${var.alertmanager_admin_password}"
+        # в переменных пароль закодирован в base64, иначе Gitlab отказывается его маскировать, т.к. после bcrypt полно спецсимволов
+        value = "admin:${base64decode(var.alertmanager_admin_password)}"
     }
     set {
         name  = "prometheus.extraSecret.data.auth"
-        value = "admin:${var.prometheus_admin_password}"
+        value = "admin:${base64decode(var.prometheus_admin_password)}"
     }
     set {
         name  = "grafana.adminPassword"
