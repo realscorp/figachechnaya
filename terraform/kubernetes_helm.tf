@@ -11,6 +11,7 @@ resource "helm_release" "certmanager" {
         value = "true"
     }
     
+    # Я пока не нашёл способа сделать implicit dependency на состояние кластера, поэтому более грязный способ
     depends_on = [mcs_kubernetes_node_group.nodegroup]
 }
 
@@ -21,5 +22,19 @@ resource "helm_release" "kube-prometheus-stack" {
     version    = "40.3.1"
     values     = [file("helm/prometheus-stack.yml")]
 
+    # Забираем настоящие пароли из CI/CD-переменных
+    set {
+        name  = "alertmanager.extraSecret.data.auth"
+        value = "admin:${var.alertmanager_admin_password}"
+    }
+    set {
+        name  = "prometheus.extraSecret.data.auth"
+        value = "admin:${var.prometheus_admin_password}"
+    }
+    set {
+        name  = "grafana.adminPassword"
+        value = var.grafana_admin_password
+    }
+    # Я пока не нашёл способа сделать implicit dependency на состояние кластера, поэтому более грязный способ
     depends_on = [mcs_kubernetes_node_group.nodegroup]
 }

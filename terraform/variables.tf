@@ -24,6 +24,16 @@ variable "postgresql_db_user" {
 variable "postgresql_db_pass" {
     type = string
 }
+variable "alertmanager_admin_password" {
+    type = string
+}
+variable "grafana_admin_password" {
+    type = string
+}
+variable "prometheus_admin_pass" {
+    type = string
+}
+
 ##########################
 # Настройки кластера Кубернетес
 variable "cluster_name" {
