@@ -51,6 +51,8 @@ alertmanager:
   ##
   config:
     global:
+      basic_auth_users:
+        user: zqMKX2JR_zzdCk-zCwgQkYqml3i7Vwe1
       resolve_timeout: 5m
     inhibit_rules:
       - source_matchers:
@@ -224,13 +226,13 @@ alertmanager:
       runAsUser: 1000
       fsGroup: 2000
     portName: "http-web"
-  extraSecret:
-    ## if not set, name will be auto generated
-    name: "alertmanager-auth-secrets"
-    annotations: {}
-    data:
-      auth: |
-        user:zqMKX2JR_zzdCk-zCwgQkYqml3i7Vwe1
+  # extraSecret:
+  #   ## if not set, name will be auto generated
+  #   name: "alertmanager-auth-secrets"
+  #   annotations: {}
+  #   data:
+  #     auth: |
+  #       user:zqMKX2JR_zzdCk-zCwgQkYqml3i7Vwe1
 
 ## Using default values from https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
 ##
