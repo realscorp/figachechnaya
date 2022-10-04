@@ -600,7 +600,7 @@ prometheus:
       repository: quay.io/prometheus/prometheus
       tag: v2.38.0
       sha: ""
-    externalUrl: "prometheus.figachechnaya.ru"
+    # externalUrl: "prometheus.figachechnaya.ru"
     secrets: []
     configMaps: []
     query: {}
