@@ -30,7 +30,7 @@ variable "alertmanager_admin_password" {
 variable "grafana_admin_password" {
     type = string
 }
-variable "prometheus_admin_pass" {
+variable "prometheus_admin_password" {
     type = string
 }
 
