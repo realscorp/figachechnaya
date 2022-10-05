@@ -24,3 +24,21 @@ resource "kubernetes_manifest" "secrets" {
         }
     }
 }
+
+# Создаём секрет для настройки Gitlab image registry
+##########################
+resource "kubernetes_manifest" "registry-secret" {
+    manifest = {
+        "apiVersion" = "v1"
+        "kind"       = "Secret"
+        "metadata" = {
+            "name"      = "registry-secret"
+            "namespace" = "default"
+        }
+        "type" = "kubernetes.io/dockerconfigjson"
+        "data" = {
+            # Эти значения мы получим из переменных окружения раннера
+            ".dockerconfigjson" = base64encode(templatefile("templates/registryconfig.tftpl",{registry_token=var.registry_token}))
+        }
+    }
+}

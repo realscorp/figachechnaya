@@ -25,6 +25,8 @@ spec:
       labels:
         app: history
     spec:
+      imagePullSecrets: 
+      - name: registry-secret
       containers:
       - name: history
         image: registry.gitlab.com/realscorp/history:1.1.1

@@ -21,9 +21,11 @@ spec:
       labels:
         app:  front
     spec:
+      imagePullSecrets: 
+      - name: registry-secret
       containers:
       - name:  front
-        image:  realscorp/figachechnaya-front:0.3.2
+        image:  registry.gitlab.com/realscorp/figachechnaya-front:1.0.0
         resources:
           requests:
             cpu: 200m

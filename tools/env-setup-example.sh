@@ -22,3 +22,4 @@ export OS_PASSWORD="*********************"
 export TF_VAR_postgresql_db_name=$DB_LOGIN
 export TF_VAR_postgresql_db_user=$DB_PASS
 export TF_VAR_postgresql_db_pass=$DB_PASS
+export TF_VAR_registry_token=gitlabresgistrytoken

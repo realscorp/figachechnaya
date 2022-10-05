@@ -33,7 +33,9 @@ variable "grafana_admin_password" {
 variable "prometheus_admin_password" {
     type = string
 }
-
+variable "registry_token" {
+    type = string
+}
 ##########################
 # Настройки кластера Кубернетес
 variable "cluster_name" {

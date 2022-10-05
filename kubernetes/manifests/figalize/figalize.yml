@@ -26,6 +26,8 @@ spec:
       labels:
         app:  figalize
     spec:
+      imagePullSecrets: 
+      - name: registry-secret
       containers:
       - name:  figalize
         image:  registry.gitlab.com/realscorp/figalize:1.1.1
