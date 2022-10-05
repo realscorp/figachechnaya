@@ -6,7 +6,14 @@ https://figachechnaya.ru
   ![скриншот](https://figachechnaya.hb.bizmrg.com/front.gif)
 </details>
 
-https://grafana.figachechnaya.ru - метрики и логи *(user:o66Vsxt7PZbpQC_PYvWL59rNBkRcWMPA)*  
+https://grafana.figachechnaya.ru - метрики и логи *(user:o66Vsxt7PZbpQC_PYvWL59rNBkRcWMPA)*
+
+<details>
+  <summary>Мониторинг</summary>
+  ![скриншот](https://figachechnaya.hb.bizmrg.com/grafana2.png)
+  ![скриншот](https://figachechnaya.hb.bizmrg.com/grafana3.png)
+</details>
+
 Репозиторий автоматически зеркалируется из https://gitlab.com/realscorp/figachechnaya
 ## Что это и зачем
 **Фигачечная** - простой сервис по офигачиванию слов (*Велосипед -> Фигасипед*).  
@@ -85,14 +92,22 @@ API доступен из интернета, и автоматически по
 - Сервисы получают сертификаты через cert-manager
 - В кластер деплоится Prometheus-stack для сбора метрик и визуализации
 - Prometheus настроен из кода на service discovery и скрейп метрик из приложений
+- В Grafana настроены 4 golden signal по метрикам из ингресса приложения и ещё пара дашбордов
 ## Todo
+- Общий формат логирования
+- Сбор логов в Loki
 - **Многочисленные** доработки мониторинга
+  - Собрать метрики из DBaaS
+  - Провижининг Grafana
+  - Доработка дашбордов
+- Более правильный пайп деплоя приложения с автосозданием тегов образов
 - Упаковка приложения в Helm-чарт
 - Управление резервными копиями БД
 - Линтинг для Python на шаге Validate
 - Добавить шаг с юнит-тестами для Python
+- Добавить шаг с SAST-тестами
 - Автоматическое управление релизами
-- Сбор логов в Loki
+
 ## Не сделано и в планах нет
 - Доработка фронтенда и линтер HTML+CSS+JS на шаге Validate: слишком нерелевантный навык для меня
 - Автотесты HTML+CSS+JS
