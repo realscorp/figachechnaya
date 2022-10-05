@@ -20,7 +20,7 @@ validate/image/history:
 build/image/history:
   extends: .dockerbuild
   variables:
-    IMAGE_TAG: history:1.1.1
+    IMAGE_TAG: history:1.1.2
     WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/microservices/history
   rules:
     - exists:
