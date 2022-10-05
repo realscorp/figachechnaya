@@ -1,10 +1,10 @@
 # Фигачечная
-https://figachechnaya.ru - сайт
+https://figachechnaya.ru
 
 <details>
-  <summary>На случай, если в облаке баланс снизится до 0, сайт выглядел так</summary>
+  <summary>Сайт</summary>
   ![скриншот](https://figachechnaya.hb.bizmrg.com/front.gif)
-<details>
+</details>
 
 https://grafana.figachechnaya.ru - метрики и логи *(user:o66Vsxt7PZbpQC_PYvWL59rNBkRcWMPA)*  
 Репозиторий автоматически зеркалируется из https://gitlab.com/realscorp/figachechnaya
