@@ -22,13 +22,13 @@ spec:
       annotations:
           prometheus.io/scrape: 'true'
           prometheus.io/path: '/metrics'
-          prometheus.io/port: '9090'
+          prometheus.io/port: '8000'
       labels:
         app:  figalize
     spec:
       containers:
       - name:  figalize
-        image:  realscorp/figalize:0.3.2
+        image:  registry.gitlab.com/realscorp/figalize:1.1.0
         resources:
           requests:
             cpu: 200m
@@ -46,11 +46,6 @@ spec:
           failureThreshold: 3
           periodSeconds: 10
         env:
-        - name: METRICS_PORT_FIGALIZE
-          valueFrom:
-            configMapKeyRef:
-              name: figalize-env
-              key: METRICS_PORT_FIGALIZE
         - name: HISTORY_APPEND_URL
           valueFrom:
             configMapKeyRef:
