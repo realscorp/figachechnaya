@@ -38,7 +38,16 @@ resource "kubernetes_manifest" "registry-secret" {
         "type" = "kubernetes.io/dockerconfigjson"
         "data" = {
             # Эти значения мы получим из переменных окружения раннера
-            ".dockerconfigjson" = base64encode(templatefile("templates/registryconfig.tftpl",{registry_token=var.registry_token}))
+            ".dockerconfigjson" = base64encode(
+                templatefile(
+                    "templates/registryconfig.tftpl",
+                    {
+                        registry_username=var.registry_username,
+                        registry_password=var.registry_password,
+                        registry_auth=base64encode("${var.registry_username}:${var.registry_password}")
+                    }
+                )
+            )
         }
     }
 }

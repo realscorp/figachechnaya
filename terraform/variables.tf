@@ -33,7 +33,10 @@ variable "grafana_admin_password" {
 variable "prometheus_admin_password" {
     type = string
 }
-variable "registry_token" {
+variable "registry_username" {
+    type = string
+}
+variable "registry_password" {
     type = string
 }
 ##########################
