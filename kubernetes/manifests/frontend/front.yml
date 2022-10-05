@@ -25,7 +25,7 @@ spec:
       - name: registry-secret
       containers:
       - name:  front
-        image:  registry.gitlab.com/realscorp/figachechnaya-front:1.0.0
+        image:  registry.gitlab.com/realscorp/figachechnaya/front:1.0.0
         resources:
           requests:
             cpu: 200m
