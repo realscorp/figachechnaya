@@ -155,5 +155,5 @@ def get_history(response: Response):
 
 # На старте постоянно пытаемся выполнить инициализацию таблицы
 # Пока не получится, флаг готовности системы будет false
-# while not init_table():
-#     time.sleep(1)
+while not init_table():
+    time.sleep(1)
