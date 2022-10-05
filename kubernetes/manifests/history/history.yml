@@ -29,14 +29,14 @@ spec:
       - name: registry-secret
       containers:
       - name: history
-        image: registry.gitlab.com/realscorp/figachechnaya/history:1.2.1
+        image: registry.gitlab.com/realscorp/figachechnaya/history:1.2.2
         resources:
           requests:
             cpu: 200m
             memory: 200Mi
           limits:
-            cpu: 500m
-            memory: 400Mi
+            cpu: 1000m
+            memory: 600Mi
         readinessProbe:
           httpGet:
             path: /api/healthz/
