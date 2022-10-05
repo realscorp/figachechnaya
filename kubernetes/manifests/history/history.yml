@@ -29,7 +29,7 @@ spec:
       - name: registry-secret
       containers:
       - name: history
-        image: registry.gitlab.com/realscorp/figachechnaya/history:1.2.0
+        image: registry.gitlab.com/realscorp/figachechnaya/history:1.2.1
         resources:
           requests:
             cpu: 200m
