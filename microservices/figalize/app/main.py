@@ -105,9 +105,9 @@ app.add_route("/metrics", handle_metrics)
 async def api_figalize_phrase(request: Request, response: Response):
     figalized_result = ''
     print('Incoming request:', request)
-    if await verify_phrase(request.phrase):
+    if verify_phrase(request.phrase):
         for phrase_word in request.phrase.split(' '):
-            figalized_result += (await figalize (phrase_word,schemas[request.schema_id]['substitutions']) + ' ')
+            figalized_result += (figalize (phrase_word,schemas[request.schema_id]['substitutions']) + ' ')
         else:
             history_data = (json.dumps(({'original':request.phrase, 'figalized':figalized_result}), indent = 4, ensure_ascii=False)).encode('utf-8').decode('unicode-escape')
             print (history_data)
