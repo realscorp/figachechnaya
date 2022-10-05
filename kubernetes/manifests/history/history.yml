@@ -20,14 +20,14 @@ spec:
     metadata:
       annotations:
         prometheus.io/scrape: 'true'
-        prometheus.io/path: '/metrics'
-        prometheus.io/port: '8000'
+        prometheus.io/path: '/metrics/'
+        prometheus.io/port: '80'
       labels:
         app: history
     spec:
       containers:
       - name: history
-        image: registry.gitlab.com/realscorp/history:1.1.0
+        image: registry.gitlab.com/realscorp/history:1.1.1
         resources:
           requests:
             cpu: 200m
@@ -38,7 +38,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /api/healthz/
-            port: 8000
+            port: 80
           initialDelaySeconds: 5
           timeoutSeconds: 2
           successThreshold: 1
@@ -71,6 +71,6 @@ spec:
               name: history
               key: db_password
         ports:
-        - containerPort: 8000
+        - containerPort: 80
           name:  api
       restartPolicy: Always

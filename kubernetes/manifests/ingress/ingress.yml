@@ -31,39 +31,32 @@ spec:
           service:
             name: figalize
             port:
-              number: 8000
+              number: 80
       - path: /api/getschemas
         pathType: Prefix
         backend:
           service:
             name: figalize
             port:
-              number: 8000
+              number: 80
       - path: /api/gethistory
         pathType: Prefix
         backend:
           service:
             name: history
             port:
-              number: 8000
+              number: 80
       - path: /api/append
         pathType: Prefix
         backend:
           service:
             name: history
             port:
-              number: 8000
+              number: 80
       - path: /api/history
         pathType: Prefix
         backend:
           service:
             name: history
             port:
-              number: 8000
-      # - path: /grafana
-      #   pathType: Prefix
-      #   backend:
-      #     service:
-      #       name: kube-prometheus-stack-grafana
-      #       port:
-      #         number: 80
+              number: 80
