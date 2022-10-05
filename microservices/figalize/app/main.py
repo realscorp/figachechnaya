@@ -113,7 +113,7 @@ async def api_figalize_phrase(request: Request, response: Response):
             print (history_data)
             # При успешном завершении фигализации, отправляем запрос к API History, чтобы дополнить историю фигализаций
             try:
-                requests.post(append_history_url, data = history_data)
+                requests.post(await append_history_url, data = history_data)
             except Exception as err:
                 print ('Ошибка при попытке обратиться к append_history_url, ', err)
             finally:

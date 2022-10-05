@@ -20,7 +20,7 @@ validate/image/figalize:
 build/image/figalize:
   extends: .dockerbuild
   variables:
-    IMAGE_TAG: figalize:1.2.0
+    IMAGE_TAG: figalize:1.2.1
     WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/microservices/figalize
   rules:
     - exists:

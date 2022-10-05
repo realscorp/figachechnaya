@@ -105,9 +105,9 @@ async def append_history(appendrequest: AppendRequest, response: Response):
         return
     # Делаем вставку в таблицу переданных значений
     try:
-        with psycopg.connect(db_connection_string) as conn:
+        async with psycopg.connect(db_connection_string) as conn:
             with conn.cursor() as cur:
-                cur.execute(
+                await cur.execute(
                     "INSERT INTO history (original, figalized) VALUES (%s, %s)",
                     (appendrequest.original, appendrequest.figalized))
     # В случае сбоя выставляем флаг неготовности системы
@@ -122,13 +122,13 @@ async def append_history(appendrequest: AppendRequest, response: Response):
 
 # API для запроса списка преобразованных слов из истории. У нас его использует фронтенд для генерации подсказки и отображения статистики
 @app.get("/api/gethistory/", status_code=200)
-def get_history(response: Response):
+async def get_history(response: Response):
     global system_is_ready
     # Пробуем выполнить запрос к БД
     try:
-        with psycopg.connect(db_connection_string) as conn:
+        async with psycopg.connect(db_connection_string) as conn:
             with conn.cursor() as cur:
-                cur.execute(
+                await cur.execute(
                     "SELECT * FROM history ORDER BY id DESC LIMIT %s",
                     (history_count,))
                 result_list = [list(x) for x in cur.fetchall()]
@@ -144,7 +144,7 @@ def get_history(response: Response):
 
 # readinessProbe для Кубернетес
 @app.get("/api/healthz/")
-def get_history(response: Response):
+async def metrics(response: Response):
     global system_is_ready
     if system_is_ready:
         response.status_code = status.HTTP_200_OK
