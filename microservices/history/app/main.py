@@ -131,10 +131,10 @@ async def get_history(response: Response):
                 await cur.execute(
                     "SELECT * FROM history ORDER BY id DESC LIMIT %s",
                     (history_count,))
-                result_list = [list(x) for x in cur.fetchall()]
+                result_list = [list(x) for x in await cur.fetchall()]
     # Если не получилось, выставляем флаг неготовности системы
-    except:
-        print ('Cannot get history')
+    except Exception as err:
+        print ('Cannot get history', err)
         system_is_ready = False
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return
