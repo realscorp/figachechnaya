@@ -5,6 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import requests
 import os
+import random
+import time
 from starlette_exporter import PrometheusMiddleware, handle_metrics
 
 system_is_ready = False
@@ -84,14 +86,16 @@ app.add_middleware(
 
 app.add_middleware(
     PrometheusMiddleware,
-    app_name="Figalize",
+    app_name="figalize",
     prefix='figalize',
     labels={
         "server_name": os.getenv("HOSTNAME"),
     },
     group_paths=True,
     buckets=[0.025, 0.037, 0.05, 0.064, 0.079, 0.096, 0.115, 0.135, 0.157, 0.181, 0.208, 0.238, 0.27, 0.305, 0.344, 0.386, 0.432, 0.483, 0.539, 0.6, 0.667, 0.741, 0.822, 0.91, 1.007, 1.113, 1.23, 1.358, 1.498, 1.651, 1.82, 2.004, 2.207, 2.428, 2.672, 2.938],
-    skip_paths=['/api/healthz'],
+    skip_paths=[
+        '/api/healthz',
+        '/metrics'],
     always_use_int_status=False
     )
 app.add_route("/metrics", handle_metrics)
@@ -121,6 +125,9 @@ async def api_figalize_phrase(request: Request, response: Response):
 # Описываем обработку запроса списка схем
 @app.get("/api/getschemas/", status_code=200)
 async def api_getschemas():
+    # Добавляем случайную задержку, чтобы график метрик смотрелся интереснее. 
+    random_latency = random.uniform(0.001, 1)
+    time.sleep(random_latency)
     count = 0
     schema_list = {}
     for schema in schemas:
