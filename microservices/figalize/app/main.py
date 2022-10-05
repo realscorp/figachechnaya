@@ -34,7 +34,7 @@ def load_schemas (filepath):
         system_is_ready = True
         return schema_list['schemas']
 
-def figalize (word,substitutions_list):
+async def figalize (word,substitutions_list):
     # Создаём пустые переменные
     all_keys = ''
     current_position = 0
@@ -62,7 +62,7 @@ def figalize (word,substitutions_list):
                     return (substitution['value'] + cropped_word)
 
 # Проверка фразы на неверные символы
-def verify_phrase (phrase):
+async def verify_phrase (phrase):
     pattern = re.compile(regexp_pattern)
     match = pattern.fullmatch(phrase)
     return match
@@ -105,9 +105,9 @@ app.add_route("/metrics", handle_metrics)
 async def api_figalize_phrase(request: Request, response: Response):
     figalized_result = ''
     print('Incoming request:', request)
-    if verify_phrase(request.phrase):
+    if await verify_phrase(request.phrase):
         for phrase_word in request.phrase.split(' '):
-            figalized_result += (figalize (phrase_word,schemas[request.schema_id]['substitutions']) + ' ')
+            figalized_result += (await figalize (phrase_word,schemas[request.schema_id]['substitutions']) + ' ')
         else:
             history_data = (json.dumps(({'original':request.phrase, 'figalized':figalized_result}), indent = 4, ensure_ascii=False)).encode('utf-8').decode('unicode-escape')
             print (history_data)
@@ -138,7 +138,7 @@ async def api_getschemas():
 
 # readinessProbe для Кубернетес
 @app.get("/api/healthz/")
-def get_history(response: Response):
+async def get_history(response: Response):
     global system_is_ready
     if system_is_ready:
         response.status_code = status.HTTP_200_OK
