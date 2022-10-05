@@ -116,7 +116,8 @@ async def api_figalize_phrase(request: Request, response: Response):
                 requests.post(append_history_url, data = history_data)
             except Exception as err:
                 print ('Ошибка при попытке обратиться к append_history_url, ', err)
-            return {'data': figalized_result}
+            finally:
+                return {'data': figalized_result}
     else:
         # Если фраза содержит неверные символы, возвращаем код 400 и сообщение об ошибке
         response.status_code = status.HTTP_400_BAD_REQUEST
