@@ -5,7 +5,7 @@ export DB_HOST=postgresql.mcs.local
 export DB_PORT=5432
 export DB_NAME=history
 export DB_LOGIN=history
-export DB_PASS=**************
+export DB_PASS='**************'
 export DB_NAME=history
 
 export HISTORY_APPEND_URL=http://localhost:9000/api/append/
@@ -22,4 +22,10 @@ export OS_PASSWORD="*********************"
 export TF_VAR_postgresql_db_name=$DB_LOGIN
 export TF_VAR_postgresql_db_user=$DB_PASS
 export TF_VAR_postgresql_db_pass=$DB_PASS
-export TF_VAR_registry_token=gitlabresgistrytoken
+
+export TF_VAR_prometheus_admin_password='******'
+export TF_VAR_grafana_admin_password='******'
+export TF_VAR_alertmanager_admin_password='******'
+
+export TF_VAR_registry_username='token-name'
+export TF_VAR_registry_password='token'
