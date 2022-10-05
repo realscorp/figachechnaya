@@ -5,5 +5,4 @@ metadata:
   name: figalize-env
   namespace: default
 data:
-  HISTORY_APPEND_URL: http://history:8000/api/append/
-  METRICS_PORT_FIGALIZE: '9090'
+  HISTORY_APPEND_URL: http://history/api/append/
