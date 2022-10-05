@@ -105,8 +105,8 @@ async def append_history(appendrequest: AppendRequest, response: Response):
         return
     # Делаем вставку в таблицу переданных значений
     try:
-        async with psycopg.connect(db_connection_string) as conn:
-            with conn.cursor() as cur:
+        async with await psycopg.AsyncConnection.connect(db_connection_string) as conn:
+            async with conn.cursor() as cur:
                 await cur.execute(
                     "INSERT INTO history (original, figalized) VALUES (%s, %s)",
                     (appendrequest.original, appendrequest.figalized))
@@ -126,8 +126,8 @@ async def get_history(response: Response):
     global system_is_ready
     # Пробуем выполнить запрос к БД
     try:
-        async with psycopg.connect(db_connection_string) as conn:
-            with conn.cursor() as cur:
+        async with await psycopg.AsyncConnection.connect(db_connection_string) as conn:
+            async with conn.cursor() as cur:
                 await cur.execute(
                     "SELECT * FROM history ORDER BY id DESC LIMIT %s",
                     (history_count,))
