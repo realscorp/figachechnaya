@@ -14,8 +14,6 @@
     TF_HTTP_LOCK_ADDRESS: ${TF_HTTP_ADDRESS}/lock # Адрес для блокировки стейта при выполнии plan или apply
     TF_HTTP_UNLOCK_ADDRESS: ${TF_HTTP_ADDRESS}/lock
     TF_HTTP_LOCK_METHOD: "POST" # метод блокировки, валидный для Gitlab-managed state
-    TF_VAR_registry_username: ${CI_REGISTRY_USER}
-    TF_VAR_registry_password: ${CI_REGISTRY_PASSWORD}
     TERRAFORMRC: |
       provider_installation {
         network_mirror {
