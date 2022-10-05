@@ -10,6 +10,7 @@ https://grafana.figachechnaya.ru - метрики и логи *(user:o66Vsxt7PZb
 
 <details>
   <summary>Мониторинг</summary>
+  Под нагрузочным тестированием через Jmeter
   ![скриншот](https://figachechnaya.hb.bizmrg.com/grafana2.png)
   ![скриншот](https://figachechnaya.hb.bizmrg.com/grafana3.png)
 </details>
