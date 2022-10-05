@@ -1,13 +1,15 @@
+# import grequests
 import re
 import json
 from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import requests
 import os
 import random
-import time
+import asyncio
+from requests_futures.sessions import FuturesSession
 from starlette_exporter import PrometheusMiddleware, handle_metrics
+from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
 
 system_is_ready = False
 regexp_pattern = "[а-яА-Яеё,. ]+"
@@ -15,6 +17,7 @@ json_path = '/var/config/example.json'
 
 # Забираем настройки из переменных окружения
 append_history_url = os.environ['HISTORY_APPEND_URL']
+enable_profiler = bool(os.environ.get('ENABLE_PROFILER')) or False
 
 # Создаём свой тип данных, чтобы загружать в него данные из запроса
 class Request(BaseModel):
@@ -34,7 +37,7 @@ def load_schemas (filepath):
         system_is_ready = True
         return schema_list['schemas']
 
-def figalize (word,substitutions_list):
+async def figalize (word,substitutions_list):
     # Создаём пустые переменные
     all_keys = ''
     current_position = 0
@@ -100,6 +103,13 @@ app.add_middleware(
     )
 app.add_route("/metrics", handle_metrics)
 
+# Удобный и очень полезный способ отпрофилировать приложение. Так я нашёл, что обычный синхронный Time.Sleep в get_schemas снижал производительность на 2 порядка!
+if enable_profiler:
+    app.add_middleware(PyInstrumentProfilerMiddleware)
+
+# Создаём объект для асинхронных запросов к appendhistory
+session = FuturesSession()
+
 # Описываем обработку запроса к API фигализации
 @app.post("/api/figalize/", status_code=200)
 async def api_figalize_phrase(request: Request, response: Response):
@@ -107,13 +117,13 @@ async def api_figalize_phrase(request: Request, response: Response):
     print('Incoming request:', request)
     if verify_phrase(request.phrase):
         for phrase_word in request.phrase.split(' '):
-            figalized_result += (figalize (phrase_word,schemas[request.schema_id]['substitutions']) + ' ')
+            figalized_result += (await figalize (phrase_word,schemas[request.schema_id]['substitutions']) + ' ')
         else:
             history_data = (json.dumps(({'original':request.phrase, 'figalized':figalized_result}), indent = 4, ensure_ascii=False)).encode('utf-8').decode('unicode-escape')
             print (history_data)
             # При успешном завершении фигализации, отправляем запрос к API History, чтобы дополнить историю фигализаций
             try:
-                requests.post(append_history_url, data = history_data)
+                session.post(append_history_url, history_data, timeout=0.1)
             except Exception as err:
                 print ('Ошибка при попытке обратиться к append_history_url, ', err)
             finally:
@@ -127,8 +137,8 @@ async def api_figalize_phrase(request: Request, response: Response):
 @app.get("/api/getschemas/", status_code=200)
 async def api_getschemas():
     # Добавляем случайную задержку, чтобы график метрик смотрелся интереснее. 
-    random_latency = random.uniform(0.001, 1)
-    time.sleep(random_latency)
+    random_latency = random.uniform(0.001, 0.5)
+    await asyncio.sleep(random_latency)
     count = 0
     schema_list = {}
     for schema in schemas:
@@ -149,4 +159,3 @@ async def get_history(response: Response):
 
 # Подгружаем схемы фигализации из файла
 schemas = load_schemas(json_path)
-
