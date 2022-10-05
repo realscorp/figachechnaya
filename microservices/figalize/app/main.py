@@ -34,7 +34,7 @@ def load_schemas (filepath):
         system_is_ready = True
         return schema_list['schemas']
 
-async def figalize (word,substitutions_list):
+def figalize (word,substitutions_list):
     # Создаём пустые переменные
     all_keys = ''
     current_position = 0
@@ -62,7 +62,7 @@ async def figalize (word,substitutions_list):
                     return (substitution['value'] + cropped_word)
 
 # Проверка фразы на неверные символы
-async def verify_phrase (phrase):
+def verify_phrase (phrase):
     pattern = re.compile(regexp_pattern)
     match = pattern.fullmatch(phrase)
     return match
@@ -113,7 +113,7 @@ async def api_figalize_phrase(request: Request, response: Response):
             print (history_data)
             # При успешном завершении фигализации, отправляем запрос к API History, чтобы дополнить историю фигализаций
             try:
-                requests.post(await append_history_url, data = history_data)
+                requests.post(append_history_url, data = history_data)
             except Exception as err:
                 print ('Ошибка при попытке обратиться к append_history_url, ', err)
             finally:
