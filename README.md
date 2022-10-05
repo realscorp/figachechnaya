@@ -1,5 +1,6 @@
 # Фигачечная
 https://figachechnaya.ru - сайт  
+![скриншот](https://figachechnaya.hb.bizmrg.com/front.gif)
 https://grafana.figachechnaya.ru - метрики и логи *(user:o66Vsxt7PZbpQC_PYvWL59rNBkRcWMPA)*  
 Репозиторий автоматически зеркалируется из https://gitlab.com/realscorp/figachechnaya
 ## Что это и зачем
@@ -72,11 +73,13 @@ API доступен из интернета, и автоматически по
 - Написан простой фронтенд на HTML+CSS+JS
 - Написаны RESTful stateless-микросервисы на Python + FastAPI с хранением данных в БД PostgreSQL
 - Микросервисы экспортируют метрики в Prometheus-формате
+- Микросервисы умеют в асинхронное выполнение запросов
+- Сервисы частично умеют в graceful degradation
 - Написан инфраструктурный Terraform-код (облачные сетевые объекты, DBaaS, K8s-кластер, деплой приложений и helm-чартов в K8s)
 - Написан Gitlab-CI пайплайн для разворачивания всего сервиса из кода (Validate -> Build -> Deploy)
 - Сервисы получают сертификаты через cert-manager
-- Сервисы частично умеют в graceful degradation
 - В кластер деплоится Prometheus-stack для сбора метрик и визуализации
+- Prometheus настроен из кода на service discovery и скрейп метрик из приложений
 ## Todo
 - **Многочисленные** доработки мониторинга
 - Упаковка приложения в Helm-чарт
