@@ -16,6 +16,7 @@ https://grafana.figachechnaya.ru - метрики и логи *(user:o66Vsxt7PZb
 </details>
 
 Репозиторий автоматически зеркалируется https://gitlab.com/realscorp/figachechnaya -> https://github.com/realscorp/figachechnaya  
+  
 Автоматизация построена через Gitlab CI
 ## Что это и зачем
 **Фигачечная** - простой сервис по офигачиванию слов (*Велосипед -> Фигасипед*).  
