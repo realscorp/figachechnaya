@@ -3,3 +3,5 @@ env-setup.sh
 terraform/.terraform
 terraform/.terraform.lock.hcl
 terraform.tfstate*
+font.ttf
+result.png
