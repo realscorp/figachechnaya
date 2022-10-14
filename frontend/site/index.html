@@ -1,5 +1,8 @@
 <script type="text/javascript" language="javascript">
     
+    var last_phrase = ''
+    var got_image_link = false
+
     document.addEventListener('DOMContentLoaded', function() {
         console.log ('Запрос к API getschemas')
         var URL = "https://figachechnaya.ru/api/getschemas/";
@@ -12,7 +15,6 @@
         console.log ('Результат: ' + xmlhttp.status);
         schemas = JSON.parse(xmlhttp.response);
         
-        // document.getElementById("result").textContent = 'OOOOO';
         schema_selection = document.getElementById("schema_selection");
         for (const schema in schemas) {
             console.log(`${schema}: ${schemas[schema]}`);
@@ -22,6 +24,7 @@
             schema_selection.appendChild(el);
         }
         history();
+        
     }, false);
     
     function send()
@@ -30,7 +33,7 @@
         var input_phrase = document.getElementById("input_phrase").value;
         var id = document.getElementById("schema_selection").value;
         var URL = "https://figachechnaya.ru/api/figalize/";
-
+        
         request = {
             schema_id: id,
             phrase: input_phrase
@@ -43,8 +46,16 @@
         xmlhttp.setRequestHeader("Content-Type", "application/json");
         xmlhttp.onreadystatechange = callbackFunction(xmlhttp);
         xmlhttp.send(request_json);
-        result = JSON.parse(xmlhttp.response);
-        document.getElementById("result").textContent = result.data;
+        
+        if (xmlhttp.status == 200) {
+            result = JSON.parse(xmlhttp.response);
+            document.getElementById("result").textContent = result.data;
+            got_image_link = false;
+            last_phrase = result.data;
+            document.getElementById("image_link").innerHTML += '<a href=""></a>';
+            image_link();
+        }
+
     }
  
     function history()
@@ -58,10 +69,36 @@
         xmlhttp.onreadystatechange = callbackFunction(xmlhttp);
         xmlhttp.send();
         result = JSON.parse(xmlhttp.response);
-        console.log(result[0][0])
+        console.log(result[0][0]);
         document.getElementById("history").textContent = 'Например, ' + result[0][1] + ' → ' + result[0][2];
         document.getElementById("statistics").textContent = 'Нами отфигачили что-то уже ' + result[0][0] + ' раз!';
         setTimeout(history, 1000);
+    }
+
+    function image_link()
+    {
+        var URL = "https://figachechnaya.ru/api/getimageurl/";
+        var xmlhttp = new XMLHttpRequest();
+
+        request = {
+            phrase: last_phrase
+        };
+        request_json = JSON.stringify(request);
+
+        xmlhttp.onreadystatechange = callbackFunction(xmlhttp);
+        xmlhttp.open("POST", URL, false);
+        xmlhttp.setRequestHeader("Content-Type", "application/json");
+        xmlhttp.onreadystatechange = callbackFunction(xmlhttp);
+        xmlhttp.send(request_json);
+        
+        if (xmlhttp.status == 200){
+            result = JSON.parse(xmlhttp.response);
+            console.log(result.data);
+            document.getElementById("image_link").innerHTML += '<a href="'+ result.data +'"> Скачать как картинку </a>';
+        } else {
+            document.getElementById("image_link").textContent = '';
+            setTimeout(image_link, 1000);
+        }
     }
 
     function callbackFunction(xmlhttp) 
@@ -98,6 +135,7 @@
                 <select name="schema_selection" id="schema_selection" style="font-family: 'Old Standard TT', sans-serif; font-size: 14px; margin: -10;"></select><br><br>
                 <p style="color: white; font-family: 'Old Standard TT', sans-serif; font-size: 16px; text-shadow: 3px 3px 5px black; margin: -5;">Схема</p><br><br>
                 <p  id="result" style="color: white; font-family: 'Old Standard TT', sans-serif; font-size: 80px; margin: -10; text-shadow: 3px 3px 5px black;">...</p>
+                <a id = "image_link" style="color: white; font-family: 'Old Standard TT', sans-serif; font-size: 20px; text-shadow: 3px 3px 5px black;" href=""> </a>
 
             </div>
             <!-- <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br> -->
