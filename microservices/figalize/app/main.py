@@ -10,14 +10,20 @@ import asyncio
 from requests_futures.sessions import FuturesSession
 from starlette_exporter import PrometheusMiddleware, handle_metrics
 from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
+from aiokafka import AIOKafkaProducer
+import uvicorn
 
 system_is_ready = False
 regexp_pattern = "[а-яА-Яеё,. ]+"
 json_path = '/var/config/example.json'
 
 # Забираем настройки из переменных окружения
+api_port = os.environ['FIGALIZE_API_PORT']
 append_history_url = os.environ['HISTORY_APPEND_URL']
 enable_profiler = bool(os.environ.get('ENABLE_PROFILER')) or False
+kafka_bootstrap = os.environ['KAFKA_BOOTSTRAP']
+kafka_topic_name = os.environ['KAFKA_TOPIC_NAME']
+kafka_group_id = os.environ['KAFKA_GROUP_ID']
 
 # Создаём свой тип данных, чтобы загружать в него данные из запроса
 class Request(BaseModel):
@@ -119,6 +125,7 @@ async def api_figalize_phrase(request: Request, response: Response):
         for phrase_word in request.phrase.split(' '):
             figalized_result += (await figalize (phrase_word,schemas[request.schema_id]['substitutions']) + ' ')
         else:
+            figalized_result = figalized_result.strip()
             history_data = (json.dumps(({'original':request.phrase, 'figalized':figalized_result}), indent = 4, ensure_ascii=False)).encode('utf-8').decode('unicode-escape')
             print (history_data)
             # При успешном завершении фигализации, отправляем запрос к API History, чтобы дополнить историю фигализаций
@@ -126,6 +133,11 @@ async def api_figalize_phrase(request: Request, response: Response):
                 session.post(append_history_url, history_data, timeout=0.1)
             except Exception as err:
                 print ('Ошибка при попытке обратиться к append_history_url, ', err)
+            # Добавляем обработанную фразу в Kafka, чтобы Imagizer смог создать картинку
+            try:
+                await kafka_produce(figalized_result)
+            except Exception as err:
+                print ('Ошибка при попытке обратиться к Kafka, ', err)
             finally:
                 return {'data': figalized_result}
     else:
@@ -157,5 +169,17 @@ async def get_history(response: Response):
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return
 
+# Непрерывно опрашиваем топик в Кафке на наличие новых сообщений, и обрабатываем их
+async def kafka_produce(text: str):
+    producer = AIOKafkaProducer(bootstrap_servers=(kafka_bootstrap))
+    await producer.start()
+    try:
+        await producer.send_and_wait(kafka_topic_name, bytes(text,'utf-8'))
+    finally:
+        await producer.stop()
+
 # Подгружаем схемы фигализации из файла
 schemas = load_schemas(json_path)
+
+# Стартуем REST API
+uvicorn.run(app=app, host="0.0.0.0", port=api_port)
