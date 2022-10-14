@@ -39,3 +39,18 @@ resource "helm_release" "kube-prometheus-stack" {
     # Я пока не нашёл способа сделать implicit dependency на состояние кластера, поэтому более грязный способ
     depends_on = [mcs_kubernetes_node_group.nodegroup]
 }
+
+resource "helm_release" "kafka" {
+    name       = "kafka"
+    repository = "https://charts.bitnami.com/bitnami"
+    chart      = "kafka"
+    version    = "19.0.0"
+
+    set {
+        name  = "global.storageClass"
+        value = "csi-ceph-ssd-ms1"
+    }
+
+    # Я пока не нашёл способа сделать implicit dependency на состояние кластера, поэтому более грязный способ
+    depends_on = [mcs_kubernetes_node_group.nodegroup]
+}
