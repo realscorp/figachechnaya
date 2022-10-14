@@ -18,6 +18,7 @@ from pydantic import BaseModel
 from starlette_exporter import PrometheusMiddleware, handle_metrics
 from uvicorn import Config, Server
 
+api_port = os.environ['IMAGIZER_API_PORT']
 s3_bucket_name = os.environ['S3_BUCKET']
 s3_path = os.environ['S3_PATH']
 s3_endpoint = os.environ['S3_ENDPOINT']
@@ -157,8 +158,9 @@ async def imagizer (text: str):
             await upload_to_bucket (filename)
     return
 
-@app.get("/api/getimageurl/", status_code=200)
+@app.post("/api/getimageurl/", status_code=200)
 async def get_image_url (request: Request, response: Response):
+    print (request)
     filename = await generate_filename(request.phrase)
     if await file_already_in_bucket(filename):
         return {'data': ('http://' + s3_bucket_name + '.hb.bizmrg.com/' + s3_path + filename)}
@@ -206,7 +208,7 @@ if not init_font():
 
 # Стартуем две непрерывно асинхронно выполняющиеся функции: API и kafka consumer/processor
 loop = asyncio.new_event_loop()
-config = Config(app=app, loop=loop, host="0.0.0.0", port=9000)
+config = Config(app=app, loop=loop, host="0.0.0.0", port=api_port)
 server = Server(config)
 loop.create_task(processing())
 loop.create_task(server.serve())
