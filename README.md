@@ -57,15 +57,18 @@ https://grafana.figachechnaya.ru - метрики и логи *(user:o66Vsxt7PZb
 - Для упрощения и ускорения разработки, тестирования и деплоя необходимо построить автоматизированный пайплайн
 - Использовать паттерны [12 Factor App](https://12factor.net/)
 ## Архитектура
-                 https://figachechnaya.ru
-                            │                                xxxxxx
-                            │SSL                           xxx x  xxxxxx
-                            │                             xxx       x  x
-                    ┌───────▼───────┐                     x    S3     xx
-                    │ INGRESS NGINX │                    xx            x
-                    └───────┬───────┘                    x   xx    xx xx
-                            │            dowload image   xxxx▲xxxxxxxxx
-                            │  ┌─────────────────────────────┘     ▲
+
+                                                            ... .......
+                                                          ... ..      ......
+                 https://figachechnaya.ru                .                 ..
+                            │                            .                 ..
+                            │SSL                      ....        S3      ..
+                            │                         .         bucket    ...
+                    ┌───────▼───────┐                 ..   .                ..
+                    │ INGRESS NGINX │                  ......               ..
+                    └───────┬───────┘                       ...  ...   .....
+                            │            dowload image        ▲... ......
+                            │  ┌──────────────────────────────┘    ▲
                             │  │                                   │
                         HTTP│  │ ┌─────────────────────────────┐   │
                             │  │ │               get image url │   │
@@ -79,7 +82,7 @@ https://grafana.figachechnaya.ru - метрики и логи *(user:o66Vsxt7PZb
     │  microservice │◄───────────────┤ microservice │  │ microservice │
     └──────┬────────┘                └──────┬───────┘  └────────▲─────┘
            │                                │                   │
-           │                                │                   │
+           │                          phrase│                   │msg
            │       ┌──────────┐         ┌───▼───────────────────┴──┐
            │       │          │         │          KAFKA           │
            │STORE  │          │         └──────────────────────────┘
