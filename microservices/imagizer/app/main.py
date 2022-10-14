@@ -1,22 +1,22 @@
+import asyncio
+import hashlib
+import os
+import sys
 from encodings.utf_8 import decode
 from fileinput import filename
 from hashlib import md5
 from itertools import count
-import os
-import sys
-from pydantic import BaseModel
-from turtle import fillcolor
-import requests
-from PIL import Image, ImageDraw, ImageFont
-from aiokafka import AIOKafkaConsumer
 from json import loads
-import asyncio
-from uvicorn import Config, Server
+from turtle import fillcolor
 import aioboto3
-import hashlib
+import requests
+from aiokafka import AIOKafkaConsumer
 from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
+from PIL import Image, ImageDraw, ImageFont
+from pydantic import BaseModel
 from starlette_exporter import PrometheusMiddleware, handle_metrics
+from uvicorn import Config, Server
 
 s3_bucket_name = os.environ['S3_BUCKET']
 s3_path = os.environ['S3_PATH']
