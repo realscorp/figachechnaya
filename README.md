@@ -15,6 +15,45 @@ https://grafana.figachechnaya.ru - метрики и логи *(user:o66Vsxt7PZb
   ![скриншот](https://figachechnaya.hb.bizmrg.com/grafana3.png)
 </details>
 
+<details>
+  <summary>Структура репозитория</summary>
+
+    .
+    ├── README.md
+    ├── ci-cd/ - пайплайны
+    ├── frontend/
+    │   ├── Dockerfile
+    │   ├── front.conf - настройка nginx
+    │   └── site/ - HTML+CSS+Javascript фронтенд
+    ├── kubernetes/
+    │   └── manifests/ - манифесты с объектами K8s для деплоя сервиса
+    │       ├── figalize/
+    │       ├── frontend/
+    │       ├── history/
+    │       ├── imagizer/
+    │       └── ingress/
+    ├── microservices/
+    │   ├── figalize/
+    │   │   ├── Dockerfile - докерфайл для сборки образа
+    │   │   ├── app/ - Python-код
+    │   │   ├── data/ - схема преобразований
+    │   │   └── requirements.txt - список Python-модулей для сборки
+    │   ├── history/
+    │   │   ├── Dockerfile
+    │   │   ├── app/
+    │   │   └── requirements.txt
+    │   └── imagizer/
+    │       ├── Dockerfile
+    │       ├── app/
+    │       └── requirements.txt
+    ├── terraform
+    │   ├── helm/ - yml-файлы с параметрами helm-чартов (почти не используется)
+    │   ├── templates/ - шаблоны для кода
+    │   └── *.tf - собственно Terraform-код для настройки сети, DBaaS, кластера k8s и деплоя
+    └── tools - вспомогательные скрипты
+
+</details>
+
 Репозиторий автоматически зеркалируется https://gitlab.com/realscorp/figachechnaya -> https://github.com/realscorp/figachechnaya  
   
 Автоматизация построена через Gitlab CI
