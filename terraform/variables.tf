@@ -19,7 +19,7 @@ variable "s3_access_key" {
     type = string
 }
 variable "s3_secret_key" {
-    type = number
+    type = string
 }
 ##########################
 # Эти значения будут браться из переменных окружения вида TF_VAR_varname
