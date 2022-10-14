@@ -3,14 +3,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name:  figalize
+  name:  imagizer
   namespace: default
   labels:
-    app:  figalize
+    app:  imagizer
 spec:
   selector:
     matchLabels:
-      app: figalize
+      app: imagizer
   replicas: 1
   strategy:
     rollingUpdate:
@@ -24,13 +24,13 @@ spec:
           prometheus.io/path: '/metrics'
           prometheus.io/port: '80'
       labels:
-        app:  figalize
+        app:  imagizer
     spec:
       imagePullSecrets: 
       - name: registry-secret
       containers:
-      - name:  figalize
-        image:  registry.gitlab.com/realscorp/figachechnaya/figalize:1.4.0
+      - name:  imagizer
+        image:  registry.gitlab.com/realscorp/figachechnaya/imagizer:1.0.0
         resources:
           requests:
             cpu: 200m
@@ -47,39 +47,57 @@ spec:
           failureThreshold: 3
           periodSeconds: 10
         env:
-        - name: HISTORY_APPEND_URL
+        - name: IMAGIZER_API_PORT
           valueFrom:
             configMapKeyRef:
-              name: figalize-env
-              key: HISTORY_APPEND_URL
-        - name: FIGALIZE_API_PORT
-          valueFrom:
-            configMapKeyRef:
-              name: figalize-env
-              key: FIGALIZE_API_PORT
+              name: imagizer-env
+              key: IMAGIZER_API_PORT
         - name: KAFKA_BOOTSTRAP
           valueFrom:
             configMapKeyRef:
-              name: figalize-env
+              name: imagizer-env
               key: KAFKA_BOOTSTRAP
         - name: KAFKA_TOPIC_NAME
           valueFrom:
             configMapKeyRef:
-              name: figalize-env
+              name: imagizer-env
               key: KAFKA_TOPIC_NAME
         - name: KAFKA_GROUP_ID
           valueFrom:
             configMapKeyRef:
-              name: figalize-env
+              name: imagizer-env
               key: KAFKA_GROUP_ID
+        - name: S3_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: imagizer-env
+              key: S3_BUCKET
+        - name: S3_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: imagizer-env
+              key: S3_PATH
+        - name: S3_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: imagizer-env
+              key: S3_ENDPOINT
+        - name: S3_FONT_LINK
+          valueFrom:
+            configMapKeyRef:
+              name: imagizer-env
+              key: S3_FONT_LINK
+        - name: S3_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: imagizer
+              key: s3_access_key
+        - name: S3_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: imagizer
+              key: s3_secret_key
         ports:
         - containerPort: 80
           name:  api
-        volumeMounts:
-        - name: config-volume
-          mountPath: /var/config/
-      volumes:
-        - name: config-volume
-          configMap:
-            name: figalize-files
       restartPolicy: Always

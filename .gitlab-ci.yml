@@ -4,5 +4,6 @@ include:
   - local: "/ci-cd/init.yml"
   - local: "/ci-cd/frontend.yml"
   - local: "/ci-cd/figalize.yml"
+  - local: "/ci-cd/imagizer.yml"
   - local: "/ci-cd/history.yml"
   - local: "/ci-cd/terraform.yml"

@@ -13,6 +13,14 @@ variable "postgresql_disk_size" {
 variable "postgresql_disk_type" {
     type = string
 }
+###########################
+# Настройки Imagizer
+variable "s3_access_key" {
+    type = string
+}
+variable "s3_secret_key" {
+    type = number
+}
 ##########################
 # Эти значения будут браться из переменных окружения вида TF_VAR_varname
 variable "postgresql_db_name" {
