@@ -20,7 +20,7 @@ validate/image/imagizer:
 build/image/imagizer:
   extends: .dockerbuild
   variables:
-    IMAGE_TAG: imagizer:1.0.0
+    IMAGE_TAG: imagizer:1.0.1
     WORKINGDIR_ROOT: ${CI_PROJECT_DIR}/microservices/imagizer
   rules:
     - exists:

@@ -30,7 +30,7 @@ spec:
       - name: registry-secret
       containers:
       - name:  imagizer
-        image:  registry.gitlab.com/realscorp/figachechnaya/imagizer:1.0.0
+        image:  registry.gitlab.com/realscorp/figachechnaya/imagizer:1.0.1
         resources:
           requests:
             cpu: 200m
