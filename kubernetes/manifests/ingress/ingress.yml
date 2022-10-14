@@ -60,3 +60,11 @@ spec:
             name: history
             port:
               number: 80
+      - path: /api/getimageurl
+        pathType: Prefix
+        backend:
+          service:
+            name: imagizer
+            port:
+              number: 80
+

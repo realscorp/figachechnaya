@@ -6,3 +6,7 @@ metadata:
   namespace: default
 data:
   HISTORY_APPEND_URL: http://history/api/append/
+  FIGALIZE_API_PORT: '80'
+  KAFKA_BOOTSTRAP: 'kafka:9092'
+  KAFKA_TOPIC_NAME: 'figalized'
+  KAFKA_GROUP_ID: 'imagizer'

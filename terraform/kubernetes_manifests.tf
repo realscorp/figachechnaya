@@ -25,6 +25,23 @@ resource "kubernetes_manifest" "secrets" {
     }
 }
 
+resource "kubernetes_manifest" "secrets-imagizer" {
+    manifest              = {
+        "apiVersion"      = "v1"
+        "kind"            = "Secret"
+        "metadata"        = {
+            "name"        = "imagizer"
+            "namespace"   = "default"
+        }
+        "type"            = "Opaque"
+        "data"            = {
+            # Эти значения мы получим из переменных окружения раннера
+            "s3_access_key"    = base64encode(var.s3_access_key,)
+            "s3_secret_key" = base64encode(var.s3_secret_key)
+        }
+    }
+}
+
 # Создаём секрет для настройки Gitlab image registry
 ##########################
 resource "kubernetes_manifest" "registry-secret" {
