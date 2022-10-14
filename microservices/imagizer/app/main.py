@@ -1,3 +1,4 @@
+from encodings.utf_8 import decode
 from fileinput import filename
 from hashlib import md5
 from itertools import count
@@ -7,8 +8,10 @@ from pydantic import BaseModel
 from turtle import fillcolor
 import requests
 from PIL import Image, ImageDraw, ImageFont
-# import  boto3
+from aiokafka import AIOKafkaConsumer
+from json import loads
 import asyncio
+from uvicorn import Config, Server
 import aioboto3
 import hashlib
 from fastapi import FastAPI, Response, status
@@ -21,11 +24,13 @@ s3_endpoint = os.environ['S3_ENDPOINT']
 s3_access_key_id = os.environ['S3_ACCESS_KEY']
 s3_secret_access_key = os.environ['S3_SECRET_KEY']
 s3_font_link = os.environ['S3_FONT_LINK']
+kafka_bootstrap = os.environ['KAFKA_BOOTSTRAP']
+kafka_topic_name = os.environ['KAFKA_TOPIC_NAME']
+kafka_group_id = os.environ['KAFKA_GROUP_ID']
 
 font_size = 72
-test_phrase = "Хреносипед"
-
 system_is_ready = False
+
 
 # API
 #######
@@ -64,9 +69,6 @@ app.add_middleware(
     )
 app.add_route("/metrics", handle_metrics)
 
-
-
-
 # Функции
 #################
 # Скачиваем шрифт
@@ -87,7 +89,7 @@ async def init_s3 ():
     system_is_ready = True
 
 # Создаём картинку: прозрачный png с надписью
-def generate_image (text: str):
+async def generate_image (text: str):
     global font_size
     try:
         font = ImageFont.truetype('font.ttf', size=font_size)
@@ -105,14 +107,15 @@ def generate_image (text: str):
         return True
 
 # Получаем MD5-хэш от входной фразы, чтобы использовать его дальше в качестве уникального имени объекта в бакете
-def generate_filename (text: str):
+async def generate_filename (text: str):
     return (hashlib.md5(bytes(text,'UTF-8')).hexdigest() + '.png')
 
 # Загружаем файл картинки в бакет
 async def upload_to_bucket (filename: str):
     global system_is_ready
+    session = aioboto3.Session()
     try:
-        async with aioboto3.client(
+        async with session.client(
                 's3',
                 aws_access_key_id=s3_access_key_id,
                 aws_secret_access_key=s3_secret_access_key,
@@ -146,17 +149,17 @@ async def file_already_in_bucket (filename):
             print ('Ошибка при доступе к бакету ', s3_bucket_name, err)
             sys.exit(1)
 
-
-# основная работа здесь
-def imagizer (text: str):
-    filename = generate_filename(text)
-    if not file_already_in_bucket(text):
-        if generate_image (text):
-            upload_to_bucket (filename)
+# Если по фразе ещё не создана картинка, то создаём и загружаем в бакет
+async def imagizer (text: str):
+    filename = await generate_filename(text)
+    if not await file_already_in_bucket(text):
+        if await generate_image (text):
+            await upload_to_bucket (filename)
+    return
 
 @app.get("/api/getimageurl/", status_code=200)
 async def get_image_url (request: Request, response: Response):
-    filename = generate_filename(request.phrase)
+    filename = await generate_filename(request.phrase)
     if await file_already_in_bucket(filename):
         return {'data': ('http://' + s3_bucket_name + '.hb.bizmrg.com/' + s3_path + filename)}
     else:
@@ -174,10 +177,37 @@ async def get_history(response: Response):
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return
 
+# Непрерывно опрашиваем топик в Кафке на наличие новых сообщений, и обрабатываем их
+async def processing():
+    consumer = AIOKafkaConsumer(
+                                kafka_topic_name,
+                                group_id=kafka_group_id,
+                                bootstrap_servers=kafka_bootstrap,
+                                auto_offset_reset='earliest',
+                                enable_auto_commit=True,
+                                )
+    # Get cluster layout and join group `my-group`
+    await consumer.start()
+    try:
+        # Consume messages
+        async for message in consumer:
+            print (str(message.value,'utf-8'))
+            await imagizer (str(message.value,'utf-8'))
+    finally:
+        # Will leave consumer group; perform autocommit if enabled.
+        await consumer.stop()
+
 
 # Предстартовая инициализация    
 #######
 # Загружаем шрифт
 if not init_font(): 
     sys.exit(1)
-asyncio.create_task (init_s3())
+
+# Стартуем две непрерывно асинхронно выполняющиеся функции: API и kafka consumer/processor
+loop = asyncio.new_event_loop()
+config = Config(app=app, loop=loop, host="0.0.0.0", port=9000)
+server = Server(config)
+loop.create_task(processing())
+loop.create_task(server.serve())
+loop.run_forever()
