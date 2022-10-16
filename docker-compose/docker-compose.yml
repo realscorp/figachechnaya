@@ -1,0 +1,228 @@
+version: '3'
+
+name: figachechnaya
+
+services: 
+  postgresql:
+    image: postgres:13.8-alpine3.16
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1000M
+        reservations:
+          cpus: '0.25'
+          memory: 300M
+    expose:
+      - '5432'
+    environment:
+      POSTGRES_DB: history
+      POSTGRES_USER: history
+      POSTGRES_PASSWORD: 123456Qq
+    networks:
+      figachechnaya:
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+
+  # zookeeper:
+  #   image: bitnami/zookeeper:latest
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '0.5'
+  #         memory: 500M
+  #       reservations:
+  #         cpus: '0.25'
+  #         memory: 300M
+  #   expose:
+  #     - '2181'
+  #   environment:
+  #     - ALLOW_ANONYMOUS_LOGIN=yes
+  #   networks:
+  #     figachechnaya:
+
+  kafka:
+    image: bitnami/kafka:latest
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1000M
+        reservations:
+          cpus: '0.25'
+          memory: 300M
+    expose:
+      - '9092'
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@127.0.0.1:9093
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    networks:
+      figachechnaya:
+    volumes:
+      - kafka:/bitnami/kafka
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server=127.0.0.1:9092 --list"]
+      start_period: 30s
+      interval: 20s
+      timeout: 15s
+      retries: 5
+    # depends_on:
+    #   - zookeeper
+
+  history:
+    build: ../microservices/history/
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 200M
+    expose:
+      - '8001'
+    environment:
+      DB_HOST: 'postgresql'
+      DB_PORT: '5432'
+      DB_NAME: history
+      DB_LOGIN: history
+      DB_PASS: 123456Qq
+      METRICS_PORT_HISTORY: '8001'
+    networks:
+      figachechnaya:
+    depends_on:
+      - postgresql
+
+  figalize:
+    build: ../microservices/figalize/
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 200M
+    expose:
+      - '8002'
+    environment:
+      HISTORY_APPEND_URL: http://history/api/append/
+      FIGALIZE_API_PORT: '8002'
+      KAFKA_BOOTSTRAP: 'kafka:9092'
+      KAFKA_TOPIC_NAME: 'figalized'
+      KAFKA_GROUP_ID: 'imagizer'
+    networks:
+      figachechnaya:
+    configs:
+      - source: figalize_schemes
+        target: /var/config/example.json
+    depends_on:
+      history:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+
+  imagizer:
+    build: ../microservices/imagizer/
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 200M
+    expose:
+      - '8003'
+    environment:
+      IMAGIZER_API_PORT: '8003'
+      KAFKA_BOOTSTRAP: 'kafka:9092'
+      KAFKA_TOPIC_NAME: 'figalized'
+      KAFKA_GROUP_ID: 'imagizer'
+      S3_BUCKET: 'figachechnaya'
+      S3_PATH: 'upload/'
+      S3_ENDPOINT: 'http://minio:8080'
+      S3_FONT_LINK: 'https://figachechnaya.hb.bizmrg.com/oldstandard.ttf'
+      S3_ACCESS_KEY: '111'
+      S3_SECRET_KEY: '222'
+    networks:
+      figachechnaya:
+    depends_on:
+      history:
+        condition: service_started
+      figalize:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+
+  frontend:
+    build: ../frontend/
+    deploy:
+      resources:
+        limits:
+          cpus: '0.40'
+          memory: 400M
+        reservations:
+          cpus: '0.20'
+          memory: 200M
+    expose:
+      - '80'
+    configs:
+      - source: front_conf
+        target: /etc/nginx/conf.d/default.conf
+    networks:
+      figachechnaya:
+    depends_on:
+      - imagizer
+      - figalize
+      - history
+
+  ingress:
+    image: nginx:stable-alpine
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 100M
+        reservations:
+          cpus: '0.1'
+          memory: 200M
+    ports: 
+      - 80:80
+      - 443:443
+    expose:
+      - '80'
+    configs:
+      - source: ingress_conf
+        target: /etc/nginx/conf.d/default.conf
+    volumes:
+      - ./ssl:/etc/nginx/ssl
+    networks:
+      figachechnaya:
+        aliases:
+          - "figachechnaya.ru"
+    depends_on:
+      - frontend
+      - imagizer
+      - figalize
+      - history
+
+configs:
+  front_conf:
+    file: ./frontend/front.conf
+  ingress_conf:
+    file: ./ingress/ingress.conf
+  figalize_schemes:
+    file: ./figalize/example.json
+networks:
+  figachechnaya:
+volumes:
+  postgresql:
+  kafka:

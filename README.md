@@ -1,16 +1,15 @@
 # Фигачечная
-https://figachechnaya.ru
+https://figachechnaya.ru  
 
 <details>
-  <summary>Сайт</summary>
+  <summary>Так выглядит сайт, когда облачный сервис оплачен</summary>
   ![скриншот](https://figachechnaya.hb.bizmrg.com/front.gif)
 </details>
 
 https://grafana.figachechnaya.ru - метрики и логи *(user:o66Vsxt7PZbpQC_PYvWL59rNBkRcWMPA)*
 
 <details>
-  <summary>Мониторинг</summary>
-  Под нагрузочным тестированием через Jmeter
+  <summary>Мониторинг под нагрузочным тестированием через Jmeter</summary>
   ![скриншот](https://figachechnaya.hb.bizmrg.com/grafana2.png)
   ![скриншот](https://figachechnaya.hb.bizmrg.com/grafana3.png)
 </details>
@@ -20,7 +19,8 @@ https://grafana.figachechnaya.ru - метрики и логи *(user:o66Vsxt7PZb
 
     .
     ├── README.md
-    ├── ci-cd/ - пайплайны
+    ├── ci-cd/ - пайплайны для Gitlab-CI
+    ├── docker-compose/ - всё, что нужно, чтобы поднять сервис локально, для удобства разработки
     ├── frontend/
     │   ├── Dockerfile
     │   ├── front.conf - настройка nginx
@@ -58,15 +58,15 @@ https://grafana.figachechnaya.ru - метрики и логи *(user:o66Vsxt7PZb
   
 Автоматизация построена через Gitlab CI
 ## Что это и зачем
-**Фигачечная** - простой сервис по офигачиванию слов (*Велосипед -> Фигасипед*).  
+**Фигачечная** - относительно сложно устроенный, но простой функционально сервис по офигачиванию слов (*Велосипед -> Фигасипед*).  
 Для меня это тренировка, чтобы обновить, закрепить и показать навыки:
 - Python (REST API, Metrics, Logging)
-- Docker
+- Docker, Docker compose
 - Kubernetes
 - Gitlab CI
 - Kafka
 - S3 API
-- Observability (Prometheus/Loki/Grafana)  
+- Observability (Prometheus/Grafana)  
 
 А ещё это способ показать понимание принципов построения микросервисного приложения и просто повод немного повеселиться :)
 # Техническое задание

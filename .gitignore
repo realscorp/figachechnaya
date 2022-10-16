@@ -5,3 +5,4 @@ terraform/.terraform.lock.hcl
 terraform.tfstate*
 font.ttf
 result.png
+docker-compose/ssl
