@@ -3,15 +3,15 @@ https://figachechnaya.ru
 
 <details>
   <summary>Так выглядит сайт, когда облачный сервис оплачен</summary>
-  ![скриншот](https://figachechnaya.hb.bizmrg.com/front.gif)
+  ![скриншот](https://i.ibb.co/7NdXM2Y/front.gif)
 </details>
 
 https://grafana.figachechnaya.ru - метрики и логи *(user:o66Vsxt7PZbpQC_PYvWL59rNBkRcWMPA)*
 
 <details>
   <summary>Мониторинг под нагрузочным тестированием через Jmeter</summary>
-  ![скриншот](https://figachechnaya.hb.bizmrg.com/grafana2.png)
-  ![скриншот](https://figachechnaya.hb.bizmrg.com/grafana3.png)
+  ![скриншот](https://i.ibb.co/nkzGPrS/grafana2.png)
+  ![скриншот](https://i.ibb.co/5j2pfqg/grafana3.png)
 </details>
 
 <details>
