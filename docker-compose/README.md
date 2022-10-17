@@ -7,3 +7,6 @@
 ## Как поднять окружение
 1. Просто перейти в каталог **docker-compose** и сгенерировать ssl-сертификаты, запустив **create_ssl_for_nginx.sh**
 2. Выполнить ***sudo docker compose -d***, затем добавить в hosts запись для figachechnaya.ru и использовать браузер для подключения. 
+## ToDo
+- Добавить minio для локального S3-стораджа
+- Разобраться с ошибкой kafka consumer в imagizer
